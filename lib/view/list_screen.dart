@@ -1,85 +1,48 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:to_do_list/view/component/to_do_app_bar.dart';
+import '../view_model/task_notifier.dart';
 import 'component/list_content.dart';
+import 'component/add_task_dialog.dart';
 
-class TodoApp extends StatefulWidget {
+class TodoApp extends ConsumerWidget {
   @override
-  _TodoAppState createState() => _TodoAppState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
 
-class _TodoAppState extends State<TodoApp> {
-  List<Map<String, dynamic>> tasks = List.generate(20, (index) => {
-    'task': '',
-    'isDone': false,
-  });
+    final taskModel = ref.watch(taskNotifierProvider);
+    final taskNotifier = ref.read(taskNotifierProvider.notifier);
 
-
-  void _addTask(String task) {
-    setState(() {
-      tasks.add({'task': task, 'isDone': false});
-    });
-  }
-
-  void _toggleTask(int index) {
-    setState(() {
-      tasks[index]['isDone'] = !tasks[index]['isDone'];
-    });
-  }
-
-  void _removeTask(int index) {
-    setState(() {
-      tasks.removeAt(index);
-    });
-  }
-
-  void _showAddTaskDialog() {
-    String newTask = '';
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text('할 일 추가'),
-          content: TextField(
-            onChanged: (value) {
-              newTask = value;
-            },
-            decoration: InputDecoration(hintText: '할 일을 입력하세요'),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                if (newTask.isNotEmpty) {
-                  _addTask(newTask);
-                  Navigator.of(context).pop();
-                }
-              },
-              child: Text('추가'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('할 일 목록'),
+      appBar: ToDoAppBar(
+        onDateChanged: (date) {
+          taskNotifier.setSelectedDate(date);
+        },
       ),
       body: ListView.builder(
-        itemCount: tasks.length,
+        itemCount: taskModel.currentTasks.length,
         itemBuilder: (context, index) {
           return ListContent(
-            task: tasks[index]['task'],
-            isDone: tasks[index]['isDone'],
-            onToggle: () => _toggleTask(index),
-            onRemove: () => _removeTask(index),
+            task: taskModel.currentTasks[index]['task'],
+            isDone: taskModel.currentTasks[index]['isDone'],
+            onToggle: () => taskNotifier.toggleTask(index),
+            onRemove: () => taskNotifier.removeTask(index),
           );
         },
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddTaskDialog,
-        child: Icon(Icons.add),
+        onPressed: () {
+          showDialog(
+            context: context,
+            builder: (context) {
+              return AddTaskDialog(
+                onTaskAdded: (task) {
+                  taskNotifier.addTask(task);
+                },
+              );
+            },
+          );
+        },
+        child: const Icon(Icons.add),
       ),
     );
   }
