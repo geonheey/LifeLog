@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:to_do_list/theme/todo_theme_color.dart';
 import 'package:to_do_list/view/component/to_do_app_bar.dart';
 import '../view_model/task_notifier.dart';
 import 'component/list_content.dart';
 import 'component/add_task_dialog.dart';
 import 'component/to_do_calendar.dart';
 
-class TodoApp extends ConsumerWidget {
+class ListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final taskModel = ref.watch(taskNotifierProvider);
@@ -37,6 +38,8 @@ class TodoApp extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: TodoThemeColor.orange,
+        foregroundColor: TodoThemeColor.black,
         onPressed: () {
           showDialog(
             context: context,
