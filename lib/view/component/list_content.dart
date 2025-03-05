@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_list/theme/todo_theme_color.dart';
 
 class ListContent extends StatelessWidget {
   final String task;
@@ -25,6 +26,7 @@ class ListContent extends StatelessWidget {
 
       leading: Checkbox(
         value: isDone,
+        activeColor: TodoThemeColor.orange,
         onChanged: (value) {
           onToggle();
         },
