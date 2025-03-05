@@ -60,7 +60,7 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
       calendarBuilders: CalendarBuilders(
         markerBuilder: (context, date, events) {
           final tasksForDate = tasks.entries
-              .where((entry) => isSameDay(entry.key, date))
+              .where((entry) => isSameDay(entry.key, date) && entry.value.isNotEmpty)
               .toList();
 
           if (tasksForDate.isNotEmpty) {
