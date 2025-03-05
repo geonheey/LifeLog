@@ -11,7 +11,7 @@ class ListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final taskModel = ref.watch(taskNotifierProvider);
-    final taskNotifier = ref.read(taskNotifierProvider.notifier);
+    final taskNotifier = ref.watch(taskNotifierProvider.notifier);
 
     return Scaffold(
       appBar: ToDoAppBar(),

@@ -68,7 +68,7 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
               width: 8.0,
               height: 8.0,
               decoration: const BoxDecoration(
-                color: TodoThemeColor.gray1,
+                color: TodoThemeColor.gray,
                 shape: BoxShape.circle,
               ),
             );

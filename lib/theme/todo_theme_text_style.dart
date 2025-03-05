@@ -4,7 +4,7 @@ import 'package:to_do_list/theme/todo_theme_color.dart';
 
 class TodoThemeTextStyle {
   static const TextStyle grayMedium14 = TextStyle(
-    color: TodoThemeColor.gray1,
+    color: TodoThemeColor.gray,
     fontSize: 14,
     fontWeight: FontWeight.w500,
   );

@@ -15,7 +15,7 @@ class ToDoAppBar extends ConsumerWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return AppBar(
-      backgroundColor: TodoThemeColor.background2,
+      backgroundColor: TodoThemeColor.background,
       elevation: 4,
       title: Row(
         mainAxisAlignment: MainAxisAlignment.start,
