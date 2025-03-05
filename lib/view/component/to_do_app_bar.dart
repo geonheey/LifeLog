@@ -1,25 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:calendar_appbar/calendar_appbar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:to_do_list/theme/todo_theme_color.dart';
 
-class ToDoAppBar extends StatelessWidget implements PreferredSizeWidget {
-  final Function(DateTime) onDateChanged;
+import 'app_bar_text.dart';
 
+class ToDoAppBar extends ConsumerWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize;
 
-  ToDoAppBar({Key? key, required this.onDateChanged})
-      : preferredSize = const Size.fromHeight(220),
-        super(key: key);
+  ToDoAppBar({Key? key})
+    : preferredSize = const Size.fromHeight(60),
+      super(key: key);
 
   @override
-  Widget build(BuildContext context) {
-    return CalendarAppBar(
-      onDateChanged: (date) => onDateChanged(date),
-      firstDate: DateTime.now(),
-      lastDate: DateTime.now().add(const Duration(days: 4)),
-      fullCalendar: false,
-      backButton: false,
-      events: [],
+  Widget build(BuildContext context, WidgetRef ref) {
+    return AppBar(
+      backgroundColor: TodoThemeColor.background2,
+      elevation: 4,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Icon(Icons.date_range, color: TodoThemeColor.black),
+          SizedBox(width: 16),
+          AppBarText(),
+        ],
+      ),
     );
   }
 }
