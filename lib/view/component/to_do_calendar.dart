@@ -4,13 +4,26 @@ import 'package:table_calendar/table_calendar.dart';
 import 'package:to_do_list/theme/todo_theme_color.dart';
 import '../../view_model/task_notifier.dart';
 
-class ToDoCalendar extends ConsumerWidget {
+class ToDoCalendar extends ConsumerStatefulWidget {
   final Function(DateTime) onDateChanged;
 
   const ToDoCalendar({Key? key, required this.onDateChanged}) : super(key: key);
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  _ToDoCalendarState createState() => _ToDoCalendarState();
+}
+
+class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
+  late DateTime _focusedDay;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusedDay = DateTime.now();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final tasks = ref.watch(taskNotifierProvider).tasks;
     final selectedDate = ref.watch(taskNotifierProvider).selectedDate;
 
@@ -19,7 +32,7 @@ class ToDoCalendar extends ConsumerWidget {
     return TableCalendar(
       firstDay: DateTime.utc(2010, 10, 16),
       lastDay: DateTime.utc(2030, 3, 14),
-      focusedDay: DateTime.now(),
+      focusedDay: _focusedDay,
       selectedDayPredicate: (day) {
         return isSameDay(day, selectedDate);
       },
@@ -30,7 +43,10 @@ class ToDoCalendar extends ConsumerWidget {
         rightChevronVisible: false,
       ),
       onDaySelected: (selectedDay, focusedDay) {
-        onDateChanged(selectedDay);
+        setState(() {
+          _focusedDay = focusedDay;
+        });
+        widget.onDateChanged(selectedDay);
       },
       calendarStyle: CalendarStyle(
         todayDecoration: BoxDecoration(

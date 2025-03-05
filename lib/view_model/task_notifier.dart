@@ -2,21 +2,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../model/task_model.dart';
 
 class TaskNotifier extends StateNotifier<TaskModel> {
-  TaskNotifier() : super(TaskModel(selectedDate: DateTime.now(), tasks: {}));
+  TaskNotifier()
+      : super(TaskModel(selectedDate: _normalizeDate(DateTime.now()), tasks: {}));
+
+  static DateTime _normalizeDate(DateTime date) {
+    return DateTime(date.year, date.month, date.day);
+  }
 
   void setSelectedDate(DateTime date) {
     state = TaskModel(
-      selectedDate: DateTime(date.year, date.month, date.day),
+      selectedDate: _normalizeDate(date),
       tasks: state.tasks,
     );
   }
 
   void addTask(String task) {
-    final selectedDateKey = state.selectedDate;
+    final selectedDateKey = _normalizeDate(state.selectedDate);
     final newTask = {'task': task, 'isDone': false};
 
     final currentTasks = List<Map<String, dynamic>>.from(state.tasks[selectedDateKey] ?? []);
-
     currentTasks.add(newTask);
 
     state = TaskModel(
@@ -29,7 +33,7 @@ class TaskNotifier extends StateNotifier<TaskModel> {
   }
 
   void toggleTask(int index) {
-    final selectedDateKey = state.selectedDate;
+    final selectedDateKey = _normalizeDate(state.selectedDate);
     final currentTasks = List<Map<String, dynamic>>.from(state.tasks[selectedDateKey] ?? []);
 
     currentTasks[index]['isDone'] = !currentTasks[index]['isDone'];
@@ -44,7 +48,7 @@ class TaskNotifier extends StateNotifier<TaskModel> {
   }
 
   void removeTask(int index) {
-    final selectedDateKey = state.selectedDate;
+    final selectedDateKey = _normalizeDate(state.selectedDate);
     final currentTasks = List<Map<String, dynamic>>.from(state.tasks[selectedDateKey] ?? []);
 
     currentTasks.removeAt(index);
