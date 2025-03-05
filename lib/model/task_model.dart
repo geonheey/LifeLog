@@ -8,7 +8,6 @@ class TaskModel {
   });
 
   List<Map<String, dynamic>> get currentTasks {
-    tasks.putIfAbsent(selectedDate, () => []);
-    return tasks[selectedDate]!;
+    return tasks[selectedDate] ?? [];
   }
 }
