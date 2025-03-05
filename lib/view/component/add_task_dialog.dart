@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_list/theme/todo_theme_color.dart';
 
 import '../../theme/todo_theme_text_style.dart';
 
@@ -24,14 +25,25 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
             newTask = value;
           });
         },
-        decoration: const InputDecoration(hintText: '할 일을 입력하세요', hintStyle: TodoThemeTextStyle.grayMedium14),
+        decoration: const InputDecoration(hintText: '할 일을 입력하세요', hintStyle: TodoThemeTextStyle.grayMedium14,enabledBorder: UnderlineInputBorder(
+          borderSide: BorderSide(color: TodoThemeColor.gray1),
+        ),
+          focusedBorder: UnderlineInputBorder(
+            borderSide: BorderSide(color: TodoThemeColor.orange),
+          ),),
       ),
       actions: [
-        TextButton(
-          onPressed: () {
-              widget.onTaskAdded(newTask);
-              Navigator.of(context).pop();
+        ElevatedButton(
+          onPressed: newTask.isEmpty
+              ? null
+              : () {
+            widget.onTaskAdded(newTask);
+            Navigator.of(context).pop();
           },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: newTask.isEmpty ? TodoThemeColor.gray1 : TodoThemeColor.orange1,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))
+          ),
           child: const Text('추가', style : TodoThemeTextStyle.blackMedium17),
         ),
       ],
