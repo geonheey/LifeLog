@@ -27,11 +27,9 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
     final tasks = ref.watch(taskNotifierProvider).tasks;
     final selectedDate = ref.watch(taskNotifierProvider).selectedDate;
 
-    print('All tasks: $tasks');
-
     return TableCalendar(
-      firstDay: DateTime.utc(2010, 10, 16),
-      lastDay: DateTime.utc(2030, 3, 14),
+      firstDay: DateTime.utc(2025, 1, 1),
+      lastDay: DateTime.utc(2035, 3, 5),
       focusedDay: _focusedDay,
       selectedDayPredicate: (day) {
         return isSameDay(day, selectedDate);
@@ -39,8 +37,8 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
       headerStyle: HeaderStyle(
         formatButtonVisible: false,
         titleCentered: true,
-        leftChevronVisible: false,
-        rightChevronVisible: false,
+        // leftChevronVisible: false,
+        // rightChevronVisible: false,
       ),
       onDaySelected: (selectedDay, focusedDay) {
         setState(() {
@@ -66,8 +64,6 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
               .map((entry) => entry.value)
               .expand((taskList) => taskList)
               .toList();
-
-          print('Tasks for $date: $tasksForDate');
 
           if (tasksForDate.isNotEmpty) {
             return Container(
