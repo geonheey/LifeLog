@@ -19,27 +19,21 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
   @override
   void initState() {
     super.initState();
-    _focusedDay = DateTime.now();
+    _focusedDay = DateTime.now().toUtc().add(Duration(hours: 9));
   }
 
   @override
   Widget build(BuildContext context) {
     final tasks = ref.watch(taskNotifierProvider).tasks;
     final selectedDate = ref.watch(taskNotifierProvider).selectedDate;
-
     return TableCalendar(
-      firstDay: DateTime.utc(2025, 1, 1),
-      lastDay: DateTime.utc(2035, 3, 5),
+      firstDay: DateTime(2025, 1, 1),
+      lastDay: DateTime(2035, 12, 31),
       focusedDay: _focusedDay,
       selectedDayPredicate: (day) {
         return isSameDay(day, selectedDate);
       },
-      headerStyle: HeaderStyle(
-        formatButtonVisible: false,
-        titleCentered: true,
-        // leftChevronVisible: false,
-        // rightChevronVisible: false,
-      ),
+      headerStyle: HeaderStyle(formatButtonVisible: false, titleCentered: true),
       onDaySelected: (selectedDay, focusedDay) {
         setState(() {
           _focusedDay = focusedDay;
@@ -59,9 +53,13 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
       ),
       calendarBuilders: CalendarBuilders(
         markerBuilder: (context, date, events) {
-          final tasksForDate = tasks.entries
-              .where((entry) => isSameDay(entry.key, date) && entry.value.isNotEmpty)
-              .toList();
+          final tasksForDate =
+              tasks.entries
+                  .where(
+                    (entry) =>
+                        isSameDay(entry.key, date) && entry.value.isNotEmpty,
+                  )
+                  .toList();
 
           if (tasksForDate.isNotEmpty) {
             return Container(
