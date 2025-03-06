@@ -1,16 +1,18 @@
-# to_do_list
-
+# To-Do List 앱
 To-Do List for Flutter Study
 
-## Getting Started
+## 프로젝트 설명
+이 앱은 사용자가 날짜별로 할 일을 관리할 수 있는 **To-Do List** 앱입니다. 사용자는 특정 날짜를 선택하여 그 날짜에 할 일을 추가하거나, 완료된 작업을 체크할 수 있습니다. 날짜별로 작업을 관리할 수 있어, 일정 관리를 보다 체계적으로 할 수 있습니다.
 
-This project is a starting point for a Flutter application.
+## 주요 기능
+- **날짜별 할 일 관리**: 사용자가 날짜를 선택하면 그 날짜에 해당하는 할 일 추가 가능.
+- **작업 추가/삭제**: 사용자가 할 일을 추가하고, 완료된 작업은 삭제 가능.
+- **작업 완료/미완료 토글**: 사용자는 작업의 완료 상태를 변경 가능.
+- **UI 디자인**: 간단하고 직관적인 디자인으로 쉽게 앱 사용 가능. (대표 색상 : 주황색, 검정색)
 
-A few resources to get you started if this is your first Flutter project:
+## 기술 스택
+- **Flutter**: 모바일 애플리케이션 개발을 위한 프레임워크.
+- **Riverpod**: 상태 관리를 위한 라이브러리.
+- **TableCalendar**: 달력을 구현하기 위한 Flutter 패키지.
+- **Dart**: 앱 개발에 사용된 프로그래밍 언어.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
