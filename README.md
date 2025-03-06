@@ -16,3 +16,5 @@ To-Do List for Flutter Study  (연습용, 서버 연결 없음)
 - **TableCalendar**: 달력을 구현하기 위한 Flutter 패키지.
 - **Dart**: 앱 개발에 사용된 프로그래밍 언어.
 
+### 프로젝트 구조
+- MVVM
