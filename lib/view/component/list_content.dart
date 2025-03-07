@@ -7,7 +7,7 @@ class ListContent extends StatelessWidget {
   final VoidCallback onToggle;
   final VoidCallback onRemove;
 
-  ListContent({
+  const ListContent({super.key, 
     required this.task,
     required this.isDone,
     required this.onToggle,

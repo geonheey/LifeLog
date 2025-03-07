@@ -8,9 +8,8 @@ class ToDoAppBar extends ConsumerWidget implements PreferredSizeWidget {
   @override
   final Size preferredSize;
 
-  ToDoAppBar({Key? key})
-    : preferredSize = const Size.fromHeight(60),
-      super(key: key);
+  const ToDoAppBar({super.key})
+    : preferredSize = const Size.fromHeight(60);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

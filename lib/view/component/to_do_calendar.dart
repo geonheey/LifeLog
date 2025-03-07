@@ -2,12 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:to_do_list/theme/todo_theme_color.dart';
+
 import '../../view_model/task_notifier.dart';
 
 class ToDoCalendar extends ConsumerStatefulWidget {
   final Function(DateTime) onDateChanged;
 
-  const ToDoCalendar({Key? key, required this.onDateChanged}) : super(key: key);
+  const ToDoCalendar({super.key, required this.onDateChanged});
 
   @override
   _ToDoCalendarState createState() => _ToDoCalendarState();
