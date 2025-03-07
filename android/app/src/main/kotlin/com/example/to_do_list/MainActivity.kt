@@ -13,7 +13,7 @@ class MainActivity : FlutterActivity() {
     private val CHANNEL_NAME = "com.example.to_do_list/task_channel"
     private val TAG = "MainActivity"
 
-    override fun configureFlutterEngine(@NonNull flutterEngine: FlutterEngine) {
+    override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_NAME)
             .setMethodCallHandler { call, result ->
