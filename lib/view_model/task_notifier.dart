@@ -44,7 +44,7 @@ class TaskNotifier extends StateNotifier<TaskModel> {
       state = TaskModel(
         selectedDate: state.selectedDate,
         tasks: tasksMap,
-        diaries: state.diaries, // diaries는 기존 상태 유지
+        diaries: state.diaries,
       );
     }
   }
@@ -64,6 +64,21 @@ class TaskNotifier extends StateNotifier<TaskModel> {
     }
   }
 
+  // 일기  불러오기
+  Future<void> loadDiaries() async {
+    final dateKey = _formatDate(state.selectedDate);
+    final result = await platform.invokeMethod('getDiary', {'date': dateKey});
+    if (result is List) {
+      final tasksForDate =
+      result.map((e) => Map<String, dynamic>.from(e)).toList();
+      state = TaskModel(
+        selectedDate: state.selectedDate,
+        tasks: state.tasks,
+        diaries: {...state.diaries, state.selectedDate: tasksForDate},
+      );
+    }
+  }
+
   // 날짜 설정
   Future<void> setSelectedDate(DateTime date) async {
     final normalized = _normalizeDate(date);
@@ -73,6 +88,7 @@ class TaskNotifier extends StateNotifier<TaskModel> {
       diaries: state.diaries,
     );
     await loadTasks();
+    await loadDiaries();
   }
 
   // 할 일 추가
