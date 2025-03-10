@@ -188,7 +188,7 @@ class TaskNotifier extends StateNotifier<TaskModel> {
   Future<void> removeDiary(int index) async {
     final normalizedDate = _normalizeDate(state.selectedDate);
     final currentDiary = List<Map<String, dynamic>>.from(
-      state.tasks[normalizedDate] ?? [],
+      state.diaries[normalizedDate] ?? [],
     );
 
     currentDiary.removeAt(index);
