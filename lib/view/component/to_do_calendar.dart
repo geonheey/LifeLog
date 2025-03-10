@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:logger/logger.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:to_do_list/theme/todo_theme_color.dart';
+import 'package:timezone/timezone.dart' as tz;
 
 import '../../view_model/task_notifier.dart';
 
@@ -16,15 +18,20 @@ class ToDoCalendar extends ConsumerStatefulWidget {
 
 class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
   late DateTime _focusedDay;
+  var detroit = tz.getLocation('Asia/Seoul');
+
 
   @override
   void initState() {
     super.initState();
-    _focusedDay = DateTime.now().toUtc().add(Duration(hours: 9));
+    _focusedDay =tz.TZDateTime.now(detroit);
   }
+  var logger = Logger();
 
   @override
   Widget build(BuildContext context) {
+    logger.d(_focusedDay);
+
     final tasks = ref.watch(taskNotifierProvider).tasks;
     final selectedDate = ref.watch(taskNotifierProvider).selectedDate;
     return TableCalendar(
@@ -41,7 +48,13 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
         });
         widget.onDateChanged(selectedDay);
       },
-      calendarStyle: CalendarStyle(
+      onPageChanged: (focusedDay) {
+        setState(() {
+          _focusedDay = focusedDay;
+        });
+        widget.onDateChanged(focusedDay);
+      },
+         calendarStyle: CalendarStyle(
         todayDecoration: BoxDecoration(
           color: TodoThemeColor.red1,
           shape: BoxShape.circle,
