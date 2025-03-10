@@ -7,6 +7,7 @@ import '../view_model/task_notifier.dart';
 import 'component/add_task_dialog.dart';
 import 'component/list_content.dart';
 import 'component/to_do_calendar.dart';
+import 'component/diary_content.dart';
 
 class ListScreen extends ConsumerWidget {
   const ListScreen({super.key});
@@ -27,14 +28,22 @@ class ListScreen extends ConsumerWidget {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: taskModel.currentTasks.length,
+              itemCount: taskModel.currentTasks.length + taskModel.currentDiaries.length,
               itemBuilder: (context, index) {
-                return ListContent(
-                  task: taskModel.currentTasks[index]['task'],
-                  isDone: taskModel.currentTasks[index]['isDone'],
-                  onToggle: () => taskNotifier.toggleTask(index),
-                  onRemove: () => taskNotifier.removeTask(index),
-                );
+                if (index < taskModel.currentTasks.length) {
+                  return ListContent(
+                    task: taskModel.currentTasks[index]['task'],
+                    isDone: taskModel.currentTasks[index]['isDone'],
+                    onToggle: () => taskNotifier.toggleTask(index),
+                    onRemove: () => taskNotifier.removeTask(index),
+                  );
+                } else {
+                  final diaryIndex = index - taskModel.currentTasks.length;
+                  return DiaryContent(
+                    diary: taskModel.currentDiaries[diaryIndex]['diary'],
+                    onRemove: () => taskNotifier.removeDiary(diaryIndex),
+                  );
+                }
               },
             ),
           ),
@@ -51,7 +60,9 @@ class ListScreen extends ConsumerWidget {
                 onTaskAdded: (task) async {
                   await taskNotifier.addTask(task);
                 },
-
+                onDiaryAdded: (diary) async {
+                  await taskNotifier.addDiary(diary);
+                },
               );
             },
           );

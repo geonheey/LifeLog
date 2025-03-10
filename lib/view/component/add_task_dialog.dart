@@ -1,50 +1,84 @@
 import 'package:flutter/material.dart';
-import 'package:to_do_list/theme/todo_theme_color.dart';
-
-import '../../theme/todo_theme_text_style.dart';
 
 class AddTaskDialog extends StatefulWidget {
-  final Function(String) onTaskAdded;
+  final Future<void> Function(String task) onTaskAdded;
+  final Future<void> Function(String diary) onDiaryAdded;
 
-  const AddTaskDialog({super.key, required this.onTaskAdded});
+  const AddTaskDialog({
+    super.key,
+    required this.onTaskAdded,
+    required this.onDiaryAdded,
+  });
 
   @override
   _AddTaskDialogState createState() => _AddTaskDialogState();
 }
 
 class _AddTaskDialogState extends State<AddTaskDialog> {
-  String newTask = '';
+  String inputText = '';
+  bool isTask = true;
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('할 일 추가', style:TodoThemeTextStyle.blackMedium17 ,),
-      content: TextField(
-        onChanged: (value) {
-          setState(() {
-            newTask = value;
-          });
-        },
-        decoration: const InputDecoration(hintText: '할 일을 입력하세요', hintStyle: TodoThemeTextStyle.grayMedium14,enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: TodoThemeColor.gray1),
-        ),
-          focusedBorder: UnderlineInputBorder(
-            borderSide: BorderSide(color: TodoThemeColor.orange),
-          ),),
+      title: Text(isTask ? '새 할 일 추가' : '새 일기 추가'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          TextField(
+            onChanged: (value) {
+              setState(() {
+                inputText = value;
+              });
+            },
+            decoration: InputDecoration(
+              labelText: isTask ? '할 일' : '일기 내용',
+            ),
+          ),
+          const SizedBox(height: 20),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    isTask = true;
+                  });
+                },
+                child: const Text('할 일'),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    isTask = false;
+                  });
+                },
+                child: const Text('일기'),
+              ),
+            ],
+          ),
+        ],
       ),
       actions: [
-        ElevatedButton(
-          onPressed: newTask.isEmpty
-              ? null
-              : () {
-            widget.onTaskAdded(newTask);
+        TextButton(
+          onPressed: () {
+            if (inputText.isNotEmpty) {
+              if (isTask) {
+                widget.onTaskAdded(inputText);
+              } else {
+                widget.onDiaryAdded(inputText);
+              }
+              Navigator.of(context).pop();
+            }
+          },
+          child: const Text('추가'),
+        ),
+        TextButton(
+          onPressed: () {
             Navigator.of(context).pop();
           },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: newTask.isEmpty ? TodoThemeColor.gray1 : TodoThemeColor.orange1,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10))
-          ),
-          child: const Text('추가', style : TodoThemeTextStyle.blackMedium17),
+          child: const Text('취소'),
         ),
       ],
     );
