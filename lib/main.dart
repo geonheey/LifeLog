@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:timezone/data/latest.dart' as tz;
 import 'package:to_do_list/view/list_screen.dart';
 import 'package:flutter/services.dart';
 
 void main() {
+  tz.initializeTimeZones();
   runApp(ProviderScope(child: MyApp()));
 }
 

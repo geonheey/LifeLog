@@ -40,8 +40,8 @@ dependencies:
   flutter_riverpod: ^2.0.0
   shared_preferences: ^2.0.9
   intl: ^0.20.0
-  flutter_log: ^1.0.0
-
+  logger : ^1.4.0
+  timezone: ^0.10.0
 
 
 dev_dependencies:
