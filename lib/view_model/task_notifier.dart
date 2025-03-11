@@ -29,24 +29,29 @@ class TaskNotifier extends StateNotifier<TaskModel> {
 
   // 모든 할 일 불러오기
   Future<void> loadAllTasks() async {
-    final result = await platform.invokeMethod('getAllTasks');
-    if (result is Map) {
-      final Map<DateTime, List<Map<String, dynamic>>> tasksMap = {};
-      result.forEach((key, value) {
-        final year = int.parse(key.substring(0, 4));
-        final month = int.parse(key.substring(4, 6));
-        final day = int.parse(key.substring(6, 8));
-        final date = DateTime(year, month, day);
-        if (value is List) {
-          tasksMap[date] =
-              value.map((e) => Map<String, dynamic>.from(e)).toList();
+    try {
+      final result = await platform.invokeMethod('getAllTasks');
+      final Map<String, dynamic> taskData = Map<String, dynamic>.from(result ?? {});
+      final updatedTasks = <DateTime, List<Map<String, dynamic>>>{};
+      taskData.forEach((key, value) {
+        try {
+          // Safely parse date string (e.g., "2025-03-11")
+          final date = DateTime.parse(key); // Use DateTime.parse for full ISO strings
+          updatedTasks[date] = (value as List<dynamic>)
+              .map((item) => Map<String, dynamic>.from(item as Map))
+              .toList();
+        } catch (e) {
+          print('Failed to parse task date "$key": $e');
         }
       });
       state = TaskModel(
-        selectedDate: state.selectedDate,
-        tasks: tasksMap,
+        tasks: updatedTasks,
         diaries: state.diaries,
+        selectedDate: state.selectedDate,
       );
+      print('Loaded tasks: $updatedTasks');
+    } catch (e) {
+      print('Error loading tasks: $e');
     }
   }
 
@@ -191,24 +196,29 @@ class TaskNotifier extends StateNotifier<TaskModel> {
     await _saveTasksForDate(normalizedDate, currentTasks);
   }
   Future<void> loadAllDiaries() async {
-    final result = await platform.invokeMethod('getAllDiary');
-    if (result is Map) {
-      final Map<DateTime, List<Map<String, dynamic>>> diariesMap = {};
-      result.forEach((key, value) {
-        final year = int.parse(key.substring(0, 4));
-        final month = int.parse(key.substring(4, 6));
-        final day = int.parse(key.substring(6, 8));
-        final date = DateTime(year, month, day);
-        if (value is List) {
-          diariesMap[date] = value.map((e) => Map<String, dynamic>.from(e)).toList();
+    try {
+      final result = await platform.invokeMethod('getAllDiary');
+      final Map<String, dynamic> diaryData = Map<String, dynamic>.from(result ?? {});
+      final updatedDiaries = <DateTime, List<Map<String, dynamic>>>{};
+      diaryData.forEach((key, value) {
+        try {
+          // Safely parse date string (e.g., "2025-03-11")
+          final date = DateTime.parse(key);
+          updatedDiaries[date] = (value as List<dynamic>)
+              .map((item) => Map<String, dynamic>.from(item as Map))
+              .toList();
+        } catch (e) {
+          print('Failed to parse diary date "$key": $e');
         }
       });
       state = TaskModel(
-        selectedDate: state.selectedDate,
         tasks: state.tasks,
-        diaries: diariesMap,
+        diaries: updatedDiaries,
+        selectedDate: state.selectedDate,
       );
-      print("Loaded all diaries: ${state.diaries}");
+      print('Loaded diaries: $updatedDiaries');
+    } catch (e) {
+      print('Error loading diaries: $e');
     }
   }
   // 일기 삭제
@@ -245,20 +255,24 @@ class TaskNotifier extends StateNotifier<TaskModel> {
   //   // Add Firebase sync here if needed
   // }
   //
-  // Future<void> updateDiary(int index, String newDiary) async {
-  //   final updatedDiaries = Map<DateTime, List<Map<String, dynamic>>>.from(state.diaries);
-  //   final diaryList = updatedDiaries[state.selectedDate] ?? [];
-  //   if (index >= 0 && index < diaryList.length) { // Validate index
-  //     diaryList[index] = {'diary': newDiary};
-  //     updatedDiaries[state.selectedDate] = diaryList;
-  //     state = TaskModel(
-  //       tasks: state.tasks,
-  //       diaries: updatedDiaries,
-  //       selectedDate: state.selectedDate,
-  //     );
-  //   }
-  //   // Add Firebase sync here if needed
-  // }
+  Future<void> updateDiary(int index, String newDiary) async {
+    print('updateDiary called: index=$index, newDiary=$newDiary');
+    final updatedDiaries = Map<DateTime, List<Map<String, dynamic>>>.from(state.diaries);
+    final diaryList = updatedDiaries[state.selectedDate] ?? [];
+    if (index >= 0 && index < diaryList.length) {
+      diaryList[index] = {'diary': newDiary};
+      updatedDiaries[state.selectedDate] = diaryList;
+      state = TaskModel(
+        tasks: state.tasks,
+        diaries: updatedDiaries,
+        selectedDate: state.selectedDate,
+      );
+      print('Diary list updated: ${updatedDiaries[state.selectedDate]}');
+    } else {
+      print('Invalid diary index: $index, list length: ${diaryList.length}');
+      throw RangeError('Diary index out of bounds');
+    }
+  }
 }
 
 final taskNotifierProvider =
