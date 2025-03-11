@@ -20,19 +20,20 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
   late DateTime _focusedDay;
   var detroit = tz.getLocation('Asia/Seoul');
 
-
   @override
   void initState() {
     super.initState();
-    _focusedDay =tz.TZDateTime.now(detroit);
+    _focusedDay = tz.TZDateTime.now(detroit);
   }
+
   var logger = Logger();
 
   @override
   Widget build(BuildContext context) {
     logger.d(_focusedDay);
-
     final tasks = ref.watch(taskNotifierProvider).tasks;
+    final diaries = ref.watch(taskNotifierProvider).diaries;
+
     final selectedDate = ref.watch(taskNotifierProvider).selectedDate;
     return TableCalendar(
       firstDay: DateTime(2025, 1, 1),
@@ -41,7 +42,7 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
       selectedDayPredicate: (day) {
         return isSameDay(day, selectedDate);
       },
-      headerStyle: HeaderStyle(formatButtonVisible: false, titleCentered: true),
+      headerStyle: const HeaderStyle(formatButtonVisible: false, titleCentered: true),
       onDaySelected: (selectedDay, focusedDay) {
         setState(() {
           _focusedDay = focusedDay;
@@ -54,7 +55,7 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
         });
         widget.onDateChanged(focusedDay);
       },
-         calendarStyle: CalendarStyle(
+      calendarStyle: const CalendarStyle(
         todayDecoration: BoxDecoration(
           color: TodoThemeColor.red1,
           shape: BoxShape.circle,
@@ -67,22 +68,45 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
       ),
       calendarBuilders: CalendarBuilders(
         markerBuilder: (context, date, events) {
-          final tasksForDate =
-              tasks.entries
-                  .where(
-                    (entry) =>
-                        isSameDay(entry.key, date) && entry.value.isNotEmpty,
-                  )
-                  .toList();
+          // Check for tasks
+          final hasTasks = tasks.entries
+              .where(
+                (entry) => isSameDay(entry.key, date) && entry.value.isNotEmpty,
+          )
+              .isNotEmpty;
 
-          if (tasksForDate.isNotEmpty) {
-            return Container(
-              width: 8.0,
-              height: 8.0,
-              decoration: const BoxDecoration(
-                color: TodoThemeColor.gray,
-                shape: BoxShape.circle,
-              ),
+          // Check for diaries
+          final hasDiaries = diaries.entries
+              .where(
+                (entry) => isSameDay(entry.key, date) && entry.value.isNotEmpty,
+          )
+              .isNotEmpty;
+
+          // Build markers based on tasks and diaries
+          if (hasTasks || hasDiaries) {
+            return Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (hasTasks)
+                  Container(
+                    width: 8.0,
+                    height: 8.0,
+                    margin: const EdgeInsets.only(right: 2.0),
+                    decoration: const BoxDecoration(
+                      color: TodoThemeColor.gray,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                if (hasDiaries)
+                  Container(
+                    width: 8.0,
+                    height: 8.0,
+                    decoration: const BoxDecoration(
+                      color: TodoThemeColor.orange,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+              ],
             );
           }
 

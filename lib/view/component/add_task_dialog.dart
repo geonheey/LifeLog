@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 
 class AddTaskDialog extends StatefulWidget {
-  final Future<void> Function(String task) onTaskAdded;
-  final Future<void> Function(String diary) onDiaryAdded;
+  final Future<void> Function(String task)? onTaskAdded;
+  final Future<void> Function(String diary)? onDiaryAdded;
+  final String? initialText;
+  final bool? isTaskInitial;
 
   const AddTaskDialog({
     super.key,
-    required this.onTaskAdded,
-    required this.onDiaryAdded,
+    this.onTaskAdded,
+    this.onDiaryAdded,
+    this.initialText,
+    this.isTaskInitial,
   });
 
   @override
@@ -15,64 +19,85 @@ class AddTaskDialog extends StatefulWidget {
 }
 
 class _AddTaskDialogState extends State<AddTaskDialog> {
-  String inputText = '';
-  bool isTask = true;
+  late TextEditingController _textController; // Use a controller for stability
+  late bool isTask;
+
+  @override
+  void initState() {
+    super.initState();
+    _textController = TextEditingController(text: widget.initialText ?? '');
+    isTask = widget.isTaskInitial ?? true;
+  }
+
+  @override
+  void dispose() {
+    _textController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = widget.initialText != null;
     return AlertDialog(
-      title: Text(isTask ? '새 할 일 추가' : '새 일기 추가'),
+      title: Text(isEditing
+          ? (isTask ? '할 일 수정' : '일기 수정')
+          : (isTask ? '새 할 일 추가' : '새 일기 추가')),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
-            onChanged: (value) {
-              setState(() {
-                inputText = value;
-              });
-            },
+            controller: _textController,
             decoration: InputDecoration(
               labelText: isTask ? '할 일' : '일기 내용',
             ),
           ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    isTask = true;
-                  });
-                },
-                child: const Text('할 일'),
-              ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () {
-                  setState(() {
-                    isTask = false;
-                  });
-                },
-                child: const Text('일기'),
-              ),
-            ],
-          ),
+          if (!isEditing) ...[
+            const SizedBox(height: 20),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      isTask = true;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: isTask ? Colors.orange : null,
+                  ),
+                  child: const Text('할 일'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      isTask = false;
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: !isTask ? Colors.orange : null,
+                  ),
+                  child: const Text('일기'),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
       actions: [
         TextButton(
           onPressed: () {
+            final inputText = _textController.text.trim();
             if (inputText.isNotEmpty) {
-              if (isTask) {
-                widget.onTaskAdded(inputText);
-              } else {
-                widget.onDiaryAdded(inputText);
+              if (isTask && widget.onTaskAdded != null) {
+                widget.onTaskAdded!(inputText);
+              } else if (!isTask && widget.onDiaryAdded != null) {
+                widget.onDiaryAdded!(inputText);
               }
               Navigator.of(context).pop();
             }
           },
-          child: const Text('추가'),
+          child: Text(isEditing ? '수정' : '추가'),
         ),
         TextButton(
           onPressed: () {

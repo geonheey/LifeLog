@@ -49,16 +49,13 @@ class MainActivity : FlutterActivity() {
 
                     "updateDiary" -> {
                         val date = call.argument<String>("date")
-                        val diary = call.argument<List<*>>("diary")
+                        val diary = call.argument<List<String>>("diary")
                         if (date != null && diary != null) {
-                            val jsonArray = JSONArray(diary)
-                            val diaryList = mutableListOf<Map<String, Any>>()
-                            for (i in 0 until jsonArray.length()) {
-                                val jsonObj = jsonArray.getJSONObject(i)
-                                val entry = jsonObj.getString("diary")
-                                diaryList.add(mapOf("diary" to entry))
+                            val diaryMap = mutableMapOf<String, Map<String, Any>>()
+                            diary.forEachIndexed { index, entry ->
+                                diaryMap[index.toString()] = mapOf("diary" to entry)
                             }
-                            tasksRef.child(date).child("diary").setValue(diaryList)
+                            tasksRef.child(date).child("diary").setValue(diaryMap)
                                 .addOnSuccessListener {
                                     Log.d(TAG, "Diary updated for date: $date")
                                     result.success("Diary updated successfully.")
@@ -101,8 +98,9 @@ class MainActivity : FlutterActivity() {
                             tasksRef.child(date).child("diary").get()
                                 .addOnSuccessListener { snapshot ->
                                     if (snapshot.exists()) {
-                                        val indicator = object : GenericTypeIndicator<List<Map<String, Any>>>() {}
-                                        val diaryList = snapshot.getValue(indicator) ?: emptyList<Map<String, Any>>()
+                                        val indicator = object : GenericTypeIndicator<Map<String, Map<String, Any>>>() {}
+                                        val diaryMap = snapshot.getValue(indicator) ?: emptyMap<String, Map<String, Any>>()
+                                        val diaryList = diaryMap.values.toList()
                                         Log.d(TAG, "date: $date, diary: $diaryList")
                                         result.success(diaryList)
                                     } else {
@@ -134,6 +132,29 @@ class MainActivity : FlutterActivity() {
                             .addOnFailureListener { e ->
                                 Log.e(TAG, "Error getting all tasks", e)
                                 result.error("ERROR", "Failed to get all tasks", null)
+                            }
+                    }
+
+                    "getAllDiary" -> {
+                        tasksRef.get()
+                            .addOnSuccessListener { snapshot ->
+                                val allDiaries = mutableMapOf<String, Any>()
+                                for (childSnapshot in snapshot.children) {
+                                    val date = childSnapshot.key ?: continue
+                                    val diarySnapshot = childSnapshot.child("diary")
+                                    if (diarySnapshot.exists()) {
+                                        val indicator = object : GenericTypeIndicator<Map<String, Map<String, Any>>>() {}
+                                        val diaryMap = diarySnapshot.getValue(indicator) ?: emptyMap<String, Map<String, Any>>()
+                                        val diaryList = diaryMap.values.toList()
+                                        allDiaries[date] = diaryList
+                                    }
+                                }
+                                Log.d(TAG, "all diaries: $allDiaries")
+                                result.success(allDiaries)
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e(TAG, "Error getting all diaries", e)
+                                result.error("ERROR", "Failed to get all diaries", null)
                             }
                     }
 

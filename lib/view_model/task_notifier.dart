@@ -14,6 +14,7 @@ class TaskNotifier extends StateNotifier<TaskModel> {
               diaries: {}),
         ) {
     loadAllTasks();
+    loadAllDiaries(); // 모든 다이어리 불러오기 추가
   }
 
   static DateTime _normalizeDate(DateTime date) {
@@ -64,20 +65,7 @@ class TaskNotifier extends StateNotifier<TaskModel> {
     }
   }
 
-  // 일기  불러오기
-  Future<void> loadDiaries() async {
-    final dateKey = _formatDate(state.selectedDate);
-    final result = await platform.invokeMethod('getDiary', {'date': dateKey});
-    if (result is List) {
-      final tasksForDate =
-      result.map((e) => Map<String, dynamic>.from(e)).toList();
-      state = TaskModel(
-        selectedDate: state.selectedDate,
-        tasks: state.tasks,
-        diaries: {...state.diaries, state.selectedDate: tasksForDate},
-      );
-    }
-  }
+
 
   // 날짜 설정
   Future<void> setSelectedDate(DateTime date) async {
@@ -109,24 +97,6 @@ class TaskNotifier extends StateNotifier<TaskModel> {
     await _saveTasksForDate(normalizedDate, currentTasks);
   }
 
-  // 일기 추가
-  Future<void> addDiary(String diary) async {
-    final normalizedDate = _normalizeDate(state.selectedDate);
-    final newDiary = {'diary': diary};
-
-    final currentDiaries =
-        List<Map<String, dynamic>>.from(state.diaries[normalizedDate] ?? []);
-    currentDiaries.add(newDiary);
-
-    state = TaskModel(
-      selectedDate: normalizedDate,
-      tasks: state.tasks,
-      diaries: {...state.diaries, normalizedDate: currentDiaries},
-    );
-
-    await _saveDiaryForDate(normalizedDate, currentDiaries);
-  }
-
   // 할 일 저장
   Future<void> _saveTasksForDate(
       DateTime date, List<Map<String, dynamic>> tasks) async {
@@ -138,16 +108,53 @@ class TaskNotifier extends StateNotifier<TaskModel> {
     });
   }
 
-  // 일기 저장
-  Future<void> _saveDiaryForDate(
-      DateTime date, List<Map<String, dynamic>> diaries) async {
-    final dateKey = _formatDate(date);
+  Future<void> loadDiaries() async {
+    final dateKey = _formatDate(state.selectedDate);
+    print("Loading diaries for $dateKey");
+    final result = await platform.invokeMethod('getDiary', {'date': dateKey});
+    print("Received diary data: $result");
+    if (result is List) {
+      final diaryList = result.map((e) => Map<String, dynamic>.from(e)).toList();
+      print("Parsed diary list: $diaryList");
+      state = TaskModel(
+        selectedDate: state.selectedDate,
+        tasks: state.tasks,
+        diaries: {...state.diaries, state.selectedDate: diaryList},
+      );
+    } else {
+      print("No diaries found for $dateKey");
+      state = TaskModel(
+        selectedDate: state.selectedDate,
+        tasks: state.tasks,
+        diaries: {...state.diaries, state.selectedDate: []},
+      );
+    }
+  }
 
+  Future<void> addDiary(String diary) async {
+    final normalizedDate = _normalizeDate(state.selectedDate);
+    final newDiary = {'diary': diary};
+    final currentDiaries = List<Map<String, dynamic>>.from(state.diaries[normalizedDate] ?? []);
+    currentDiaries.add(newDiary);
+
+    state = TaskModel(
+      selectedDate: normalizedDate,
+      tasks: state.tasks,
+      diaries: {...state.diaries, normalizedDate: currentDiaries},
+    );
+
+    await _saveDiaryForDate(normalizedDate, currentDiaries);
+  }
+
+  Future<void> _saveDiaryForDate(DateTime date, List<Map<String, dynamic>> diaries) async {
+    final dateKey = _formatDate(date);
+    print("🔥 Saving diary for $dateKey: $diaries");
     await platform.invokeMethod('updateDiary', {
       'date': dateKey,
       'diary': diaries,
     });
   }
+
 
   // 할 일 완료 상태 토글
   Future<void> toggleTask(int index) async {
@@ -183,7 +190,27 @@ class TaskNotifier extends StateNotifier<TaskModel> {
 
     await _saveTasksForDate(normalizedDate, currentTasks);
   }
-
+  Future<void> loadAllDiaries() async {
+    final result = await platform.invokeMethod('getAllDiary');
+    if (result is Map) {
+      final Map<DateTime, List<Map<String, dynamic>>> diariesMap = {};
+      result.forEach((key, value) {
+        final year = int.parse(key.substring(0, 4));
+        final month = int.parse(key.substring(4, 6));
+        final day = int.parse(key.substring(6, 8));
+        final date = DateTime(year, month, day);
+        if (value is List) {
+          diariesMap[date] = value.map((e) => Map<String, dynamic>.from(e)).toList();
+        }
+      });
+      state = TaskModel(
+        selectedDate: state.selectedDate,
+        tasks: state.tasks,
+        diaries: diariesMap,
+      );
+      print("Loaded all diaries: ${state.diaries}");
+    }
+  }
   // 일기 삭제
   Future<void> removeDiary(int index) async {
     final normalizedDate = _normalizeDate(state.selectedDate);
@@ -200,6 +227,38 @@ class TaskNotifier extends StateNotifier<TaskModel> {
 
     await _saveTasksForDate(normalizedDate, currentDiary);
   }
+  // Future<void> updateTask(int index, String newTask) async {
+  //   final updatedTasks = Map<DateTime, List<Map<String, dynamic>>>.from(state.tasks);
+  //   final taskList = updatedTasks[state.selectedDate] ?? [];
+  //   if (index >= 0 && index < taskList.length) { // Validate index
+  //     taskList[index] = {
+  //       'task': newTask,
+  //       'isDone': taskList[index]['isDone'], // Preserve isDone
+  //     };
+  //     updatedTasks[state.selectedDate] = taskList;
+  //     state = TaskModel(
+  //       tasks: updatedTasks,
+  //       diaries: state.diaries,
+  //       selectedDate: state.selectedDate,
+  //     );
+  //   }
+  //   // Add Firebase sync here if needed
+  // }
+  //
+  // Future<void> updateDiary(int index, String newDiary) async {
+  //   final updatedDiaries = Map<DateTime, List<Map<String, dynamic>>>.from(state.diaries);
+  //   final diaryList = updatedDiaries[state.selectedDate] ?? [];
+  //   if (index >= 0 && index < diaryList.length) { // Validate index
+  //     diaryList[index] = {'diary': newDiary};
+  //     updatedDiaries[state.selectedDate] = diaryList;
+  //     state = TaskModel(
+  //       tasks: state.tasks,
+  //       diaries: updatedDiaries,
+  //       selectedDate: state.selectedDate,
+  //     );
+  //   }
+  //   // Add Firebase sync here if needed
+  // }
 }
 
 final taskNotifierProvider =
