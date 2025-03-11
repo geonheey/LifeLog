@@ -53,8 +53,8 @@ class ListScreen extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: TodoThemeColor.orange,
-        foregroundColor: TodoThemeColor.black,
+        backgroundColor: TodoThemeColor.primary,
+        foregroundColor: TodoThemeColor.white,
         onPressed: () {
           showDialog(
             context: context,

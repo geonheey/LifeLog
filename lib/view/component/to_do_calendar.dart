@@ -57,14 +57,14 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
       },
       calendarStyle: const CalendarStyle(
         todayDecoration: BoxDecoration(
-          color: TodoThemeColor.red1,
+          color: TodoThemeColor.primaryLight2,
           shape: BoxShape.circle,
         ),
         selectedDecoration: BoxDecoration(
-          color: TodoThemeColor.orange,
+          color: TodoThemeColor.primary,
           shape: BoxShape.circle,
         ),
-        weekendTextStyle: TextStyle(color: TodoThemeColor.red),
+        weekendTextStyle: TextStyle(color: TodoThemeColor.primaryLight2),
       ),
       calendarBuilders: CalendarBuilders(
         markerBuilder: (context, date, events) {
@@ -102,7 +102,7 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
                     width: 8.0,
                     height: 8.0,
                     decoration: const BoxDecoration(
-                      color: TodoThemeColor.orange,
+                      color: TodoThemeColor.gray2,
                       shape: BoxShape.circle,
                     ),
                   ),

@@ -21,8 +21,8 @@ class TodoThemeTextStyle {
     fontWeight: FontWeight.w600,
   );
 
-  static const TextStyle orangeBold23 = TextStyle(
-    color: TodoThemeColor.orange,
+  static const TextStyle primaryBold23 = TextStyle(
+    color: TodoThemeColor.primary,
     fontSize: 23,
     fontWeight: FontWeight.w600,
   );

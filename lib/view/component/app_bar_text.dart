@@ -10,9 +10,9 @@ class AppBarText extends ConsumerWidget {
     return RichText(
       text: TextSpan(
         children: [
-          TextSpan(text: '4', style: TodoThemeTextStyle.orangeBold23),
+          TextSpan(text: '앙거니의', style: TodoThemeTextStyle.primaryBold23),
           WidgetSpan(child: SizedBox(width: 8)),
-          TextSpan(text: 'fourlab', style: TodoThemeTextStyle.darkBold23),
+          TextSpan(text: 'ToDo', style: TodoThemeTextStyle.darkBold23),
         ],
       ),
     );

@@ -7,7 +7,7 @@ class ListContent extends StatelessWidget {
   final VoidCallback onToggle;
   final VoidCallback onRemove;
 
-  const ListContent({super.key, 
+  const ListContent({super.key,
     required this.task,
     required this.isDone,
     required this.onToggle,
@@ -26,7 +26,7 @@ class ListContent extends StatelessWidget {
 
       leading: Checkbox(
         value: isDone,
-        activeColor: TodoThemeColor.orange,
+        activeColor: TodoThemeColor.primary,
         onChanged: (value) {
           onToggle();
         },
