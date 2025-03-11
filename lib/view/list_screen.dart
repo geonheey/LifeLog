@@ -5,9 +5,9 @@ import 'package:to_do_list/view/component/to_do_app_bar.dart';
 
 import '../view_model/task_notifier.dart';
 import 'component/add_task_dialog.dart';
+import 'component/diary_content.dart';
 import 'component/list_content.dart';
 import 'component/to_do_calendar.dart';
-import 'component/diary_content.dart';
 
 class ListScreen extends ConsumerWidget {
   const ListScreen({super.key});
@@ -28,7 +28,8 @@ class ListScreen extends ConsumerWidget {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: taskModel.currentTasks.length + taskModel.currentDiaries.length,
+              itemCount: taskModel.currentTasks.length +
+                  taskModel.currentDiaries.length,
               itemBuilder: (context, index) {
                 if (index < taskModel.currentTasks.length) {
                   return ListContent(
@@ -39,9 +40,11 @@ class ListScreen extends ConsumerWidget {
                   );
                 } else {
                   final diaryIndex = index - taskModel.currentTasks.length;
+                  final diaryItem = taskModel.currentDiaries[diaryIndex];
                   return DiaryContent(
-                    diary: taskModel.currentDiaries[diaryIndex]['diary'],
+                    diary: diaryItem['diary'] as String,
                     onRemove: () => taskNotifier.removeDiary(diaryIndex),
+                    index: diaryIndex,
                   );
                 }
               },
