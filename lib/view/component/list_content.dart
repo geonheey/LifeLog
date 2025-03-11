@@ -7,7 +7,8 @@ class ListContent extends StatelessWidget {
   final VoidCallback onToggle;
   final VoidCallback onRemove;
 
-  const ListContent({super.key,
+  const ListContent({
+    super.key,
     required this.task,
     required this.isDone,
     required this.onToggle,
@@ -16,26 +17,35 @@ class ListContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      title: Text(
-        task,
-        style: TextStyle(
-          decoration: isDone ? TextDecoration.lineThrough : null,
+    return Column(
+      children: [
+        ListTile(
+          title: Text(
+            task,
+            style: TextStyle(
+              decoration: isDone ? TextDecoration.lineThrough : null,
+            ),
+          ),
+          leading: Checkbox(
+            value: isDone,
+            activeColor: TodoThemeColor.primary,
+            onChanged: (value) {
+              onToggle();
+            },
+          ),
+          trailing: IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: onRemove,
+          ),
         ),
-      ),
-
-      leading: Checkbox(
-        value: isDone,
-        activeColor: TodoThemeColor.primary,
-        onChanged: (value) {
-          onToggle();
-        },
-      ),
-
-      trailing: IconButton(
-        icon: Icon(Icons.delete),
-        onPressed: onRemove,
-      ),
+        const Divider(
+          color: TodoThemeColor.gray2,
+          height: 1,
+          thickness: 1,
+          indent: 15,
+          endIndent: 15,
+        ),
+      ],
     );
   }
 }

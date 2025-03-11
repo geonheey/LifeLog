@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:to_do_list/theme/todo_theme_color.dart';
 
 class AddTaskDialog extends StatefulWidget {
   final Future<void> Function(String task)? onTaskAdded;
@@ -63,9 +64,9 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                     });
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isTask ? Colors.orange : null,
+                    backgroundColor: isTask ? TodoThemeColor.primary : null,
                   ),
-                  child: const Text('할 일'),
+                  child: const Text('할 일', style: TextStyle( color:  TodoThemeColor.white,)),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
@@ -75,10 +76,9 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
                     });
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: !isTask ? Colors.orange : null,
+                    backgroundColor: !isTask ? TodoThemeColor.primary : null,
                   ),
-                  child: const Text('일기'),
-                ),
+                  child: const Text('일기', style: TextStyle( color:  TodoThemeColor.white,)),                ),
               ],
             ),
           ],
@@ -97,13 +97,13 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
               Navigator.of(context).pop();
             }
           },
-          child: Text(isEditing ? '수정' : '추가'),
+          child: Text(isEditing ? '수정' : '추가', style: TextStyle( color:  TodoThemeColor.black,)),
         ),
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('취소'),
+          child: const Text('취소',style: TextStyle( color:  TodoThemeColor.black,)),
         ),
       ],
     );
