@@ -32,6 +32,8 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
   Widget build(BuildContext context) {
     final tasks = ref.watch(taskNotifierProvider).tasks;
     final diaries = ref.watch(taskNotifierProvider).diaries;
+    final days = ref.watch(taskNotifierProvider).days;
+
 
     final selectedDate = ref.watch(taskNotifierProvider).selectedDate;
     return TableCalendar(
@@ -67,24 +69,40 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
       ),
       calendarBuilders: CalendarBuilders(
         markerBuilder: (context, date, events) {
-          // Check for tasks
+          // 태스크 체크
           final hasTasks = tasks.entries
               .where(
                 (entry) => isSameDay(entry.key, date) && entry.value.isNotEmpty,
           )
               .isNotEmpty;
 
-          // Check for diaries
+          // 일기 체크
           final hasDiaries = diaries.entries
               .where(
                 (entry) => isSameDay(entry.key, date) && entry.value.isNotEmpty,
           )
               .isNotEmpty;
+          // 일정 체크
+          final hasDays = days.entries
+              .where(
+                (entry) => isSameDay(entry.key, date) && entry.value.isNotEmpty,
+          )
+              .isNotEmpty;
 
-          if (hasTasks || hasDiaries) {
+          if (hasTasks || hasDiaries || hasDays) {
             return Row(
               mainAxisSize: MainAxisSize.min,
               children: [
+                if (hasDays)
+                  Container(
+                    width: 8.0,
+                    height: 8.0,
+                    margin: const EdgeInsets.only(right: 2.0),
+                    decoration: const BoxDecoration(
+                      color: TodoThemeColor.red,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
                 if (hasTasks)
                   Container(
                     width: 8.0,
@@ -104,6 +122,7 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
                       shape: BoxShape.circle,
                     ),
                   ),
+
               ],
             );
           }

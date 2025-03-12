@@ -4,6 +4,7 @@ import 'package:to_do_list/theme/todo_theme_text_style.dart';
 import '../../theme/todo_theme_color.dart';
 import '../diary_detail_screen.dart';
 
+
 class DiaryContent extends StatelessWidget {
   final String diary;
   final VoidCallback onRemove;
@@ -23,6 +24,11 @@ class DiaryContent extends StatelessWidget {
     return Column(
       children: [
         ListTile(
+          leading: const Icon(
+            Icons.library_books,
+            size: 24,
+            color: TodoThemeColor.black,
+          ),
           title: GestureDetector(
             onTap: () {
               Navigator.push(
@@ -32,25 +38,11 @@ class DiaryContent extends StatelessWidget {
                 ),
               );
             },
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 3, 24, 0),
-                  child: Icon(
-                    Icons.library_books,
-                    size: 24,
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    diary,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 15),
-                  ),
-                ),
-              ],
+            child: Text(
+              diary,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: TodoThemeTextStyle.blackMedium15,
             ),
           ),
           trailing: IconButton(

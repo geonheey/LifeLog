@@ -24,33 +24,24 @@ class DayContent extends StatelessWidget {
     return Column(
       children: [
         ListTile(
+
           title: GestureDetector(
             onTap: () => _showEditDialog(context),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Padding(
-                  padding: EdgeInsets.fromLTRB(12, 3, 24, 0),
-                  child: Icon(
-                    Icons.star_border_outlined,
-                    color : TodoThemeColor.red,
-                    size: 24,
-                    // color: TodoThemeColor.black,
-                  ),
-                ),
-                Expanded(
-                  child: Text(
-                    day,
-                    maxLines: 3,
-                    overflow: TextOverflow.ellipsis,
-                    style: TodoThemeTextStyle.blackMedium15,
-                  ),
-                ),
-              ],
+            child: Text(
+              day,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: TodoThemeTextStyle.blackMedium15,
             ),
           ),
+          leading: Icon(
+            Icons.star_border_outlined,
+            color: TodoThemeColor.red,
+            size: 24,
+            // color: TodoThemeColor.black,
+          ),
           trailing: IconButton(
-            icon: Icon(Icons.expand_circle_down_outlined),
+            icon: Icon(Icons.dangerous_outlined),
             iconSize: 15,
             onPressed: () {
               _showBottomSheet(context);
@@ -82,6 +73,7 @@ class DayContent extends StatelessWidget {
       },
     );
   }
+
   void _showBottomSheet(BuildContext context) {
     showCupertinoModalPopup(
       context: context,
@@ -89,7 +81,10 @@ class DayContent extends StatelessWidget {
         return CupertinoActionSheet(
           actions: [
             CupertinoActionSheetAction(
-              child: Text('삭제',style: TodoThemeTextStyle.redMedium17,),
+              child: Text(
+                '삭제',
+                style: TodoThemeTextStyle.redMedium17,
+              ),
               onPressed: () {
                 Navigator.pop(context);
                 onRemove();
@@ -97,7 +92,10 @@ class DayContent extends StatelessWidget {
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
-            child: Text('취소', style: TodoThemeTextStyle.blackMedium17,),
+            child: Text(
+              '취소',
+              style: TodoThemeTextStyle.blackMedium17,
+            ),
             onPressed: () {
               Navigator.pop(context);
             },

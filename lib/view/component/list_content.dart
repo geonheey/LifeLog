@@ -23,20 +23,26 @@ class ListContent extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          title: Text(
-            task,
-            style: TextStyle(
-              fontSize: 15,
-              decoration: isDone ? TextDecoration.lineThrough : null,
-            ),
-          ),
+          contentPadding: const EdgeInsets.fromLTRB(12,0,24,0), // 좌우 패딩 줄이기
+
           leading: Checkbox(
             value: isDone,
             activeColor: TodoThemeColor.primary,
+            visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
             onChanged: (value) {
               onToggle();
             },
           ),
+          title: Text(
+            task,
+            style: TextStyle(
+              color: TodoThemeTextStyle.blackMedium15.color,
+              fontSize: TodoThemeTextStyle.blackMedium15.fontSize,
+              fontWeight: TodoThemeTextStyle.blackMedium15.fontWeight,
+              decoration: isDone ? TextDecoration.lineThrough : null,
+            ),
+          ),
+
           trailing: IconButton(
             icon: Icon(Icons.dangerous_outlined),
             iconSize: 15,
