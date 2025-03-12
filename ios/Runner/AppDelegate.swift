@@ -18,22 +18,28 @@ import Flutter
                                            binaryMessenger: controller.binaryMessenger)
 
         channel.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
-            switch call.method {
-            case "updateTasks":
-                self.updateTasks(call: call, result: result)
-            case "updateDiaries":
-                self.updateDiaries(call: call, result: result)
-            case "getTasks":
-                self.getTasks(call: call, result: result)
-            case "getDiaries":
-                self.getDiaries(call: call, result: result)
-            case "getAllTasks":
-                self.getAllTasks(call: call, result: result)
-            case "getAllDiaries":
-                self.getAllDiaries(call: call, result: result)
-            default:
-                result(FlutterMethodNotImplemented)
-            }
+           switch call.method {
+                       case "updateTasks":
+                           self.updateTasks(call: call, result: result)
+                       case "updateDiaries":
+                           self.updateDiaries(call: call, result: result)
+                       case "getTasks":
+                           self.getTasks(call: call, result: result)
+                       case "getDiaries":
+                           self.getDiaries(call: call, result: result)
+                       case "getAllTasks":
+                           self.getAllTasks(call: call, result: result)
+                       case "getAllDiaries":
+                           self.getAllDiaries(call: call, result: result)
+                       case "getAllDays":
+                           self.getAllDays(call: call, result: result)
+                       case "updateDays": // 추가된 케이스
+                           self.updateDays(call: call, result: result)
+                       case "getDays": // 누락된 케이스 추가
+                           self.getDays(call: call, result: result)
+                       default:
+                           result(FlutterMethodNotImplemented)
+                       }
         }
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
@@ -157,4 +163,64 @@ import Flutter
             result(FlutterError(code: "ERROR", message: "Failed to get all diaries", details: nil))
         }
     }
+
+    // day 업데이트
+    func updateDays(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let args = call.arguments as? [String: Any],
+              let date = args["date"] as? String,
+              let days = args["days"] as? [[String: Any]] else {
+            result(FlutterError(code: "INVALID_ARGUMENT", message: "Missing arguments", details: nil))
+            return
+        }
+
+        let ref = Database.database().reference().child("days").child(date)
+        ref.setValue(days) { error, _ in
+            if let error = error {
+                print("Error updating days: \(error.localizedDescription)")
+                result(FlutterError(code: "ERROR", message: "Failed to update days", details: nil))
+            } else {
+                print("Days updated for date: \(date)")
+                result("Days updated successfully.")
+            }
+        }
+    }
+
+    // 특정 날짜의 day 가져오기
+    func getDays(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        guard let args = call.arguments as? [String: Any],
+              let date = args["date"] as? String else {
+            result(FlutterError(code: "INVALID_ARGUMENT", message: "Missing date argument", details: nil))
+            return
+        }
+
+        let ref = Database.database().reference().child("days").child(date)
+        ref.observeSingleEvent(of: .value) { snapshot in
+            if snapshot.exists(), let daysList = snapshot.value as? [[String: Any]] {
+                print("date: \(date), days: \(daysList)")
+                result(daysList)
+            } else {
+                result([])
+            }
+        } withCancel: { error in
+            print("Error getting days: \(error.localizedDescription)")
+            result(FlutterError(code: "ERROR", message: "Failed to get days", details: nil))
+        }
+    }
+
+    // 모든 day 가져오기
+    func getAllDays(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let ref = Database.database().reference().child("days")
+        ref.observeSingleEvent(of: .value) { snapshot in
+            if snapshot.exists(), let data = snapshot.value as? [String: Any] {
+                print("All days: \(data)")
+                result(data)
+            } else {
+                result([:])
+            }
+        } withCancel: { error in
+            print("Error getting all days: \(error.localizedDescription)")
+            result(FlutterError(code: "ERROR", message: "Failed to get all days", details: nil))
+        }
+    }
+
 }

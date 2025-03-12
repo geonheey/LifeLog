@@ -12,10 +12,12 @@ class TaskNotifier extends StateNotifier<TaskModel> {
       selectedDate: _normalizeDate(DateTime.now()),
       tasks: {},
       diaries: {},
+      days: {},
     ),
   ) {
     loadAllTasks();
     loadAllDiaries();
+    loadAllDays();
   }
 
   static DateTime _normalizeDate(DateTime date) {
@@ -34,6 +36,7 @@ class TaskNotifier extends StateNotifier<TaskModel> {
     state = state.copyWith(selectedDate: normalized);
     await loadTasks();
     await loadDiaries();
+    await loadAllDays();
   }
 
   // 모든 할 일 불러오기
@@ -228,6 +231,100 @@ class TaskNotifier extends StateNotifier<TaskModel> {
       await _saveDiaryForDate(normalizedDate, currentDiaries);
     } else {
       throw RangeError('Diary index out of bounds');
+    }
+  }
+  /////////////////////////
+/// 모든 'day' 불러오기
+  Future<void> loadAllDays() async {
+    try {
+      final result = await platform.invokeMethod('getAllDays');
+      final Map<String, dynamic> dayData =
+      Map<String, dynamic>.from(result ?? {});
+      final updatedDays = <DateTime, List<Map<String, dynamic>>>{};
+
+      dayData.forEach((key, value) {
+        try {
+          final date = DateTime.parse(key);
+          updatedDays[date] = (value as List<dynamic>)
+              .map((item) => Map<String, dynamic>.from(item as Map))
+              .toList();
+        } catch (e) {
+          print('Failed to parse day date "$key": $e');
+        }
+      });
+
+      state = state.copyWith(days: updatedDays);
+      print('Loaded days: $updatedDays');
+    } catch (e) {
+      print('Error loading days: $e');
+    }
+  }
+
+  // 날짜별 'day' 불러오기
+  Future<void> loadDay() async {
+    final dateKey = _formatDate(state.selectedDate);
+    try {
+      final result = await platform.invokeMethod('getDays', {'date': dateKey});
+      if (result is List) {
+        final dayList = result.map((e) => Map<String, dynamic>.from(e)).toList();
+        state = state.copyWith(
+          days: {...state.days, state.selectedDate: dayList},
+        );
+      }
+    } catch (e) {
+      print('Error loading day: $e');
+    }
+  }
+
+  // 날짜별 'day' 추가
+  Future<void> addDay(String day) async {
+    final normalizedDate = _normalizeDate(state.selectedDate);
+    final newDay = {'day': day};
+    final currentDays = List<Map<String, dynamic>>.from(state.days[normalizedDate] ?? []);
+    currentDays.add(newDay);
+
+    state = state.copyWith(
+      days: {...state.days, normalizedDate: currentDays},
+    );
+
+    await _saveDayForDate(normalizedDate, currentDays);
+  }
+
+  // 날짜별 'day' 저장
+  Future<void> _saveDayForDate(DateTime date, List<Map<String, dynamic>> days) async {
+    final dateKey = _formatDate(date);
+    await platform.invokeMethod('updateDays', {
+      'date': dateKey,
+      'days': days,
+    });
+  }
+
+  // 날짜별 'day' 삭제
+  Future<void> removeDay(int index) async {
+    final normalizedDate = _normalizeDate(state.selectedDate);
+    final currentDays = List<Map<String, dynamic>>.from(state.days[normalizedDate] ?? []);
+    currentDays.removeAt(index);
+
+    state = state.copyWith(
+      days: {...state.days, normalizedDate: currentDays},
+    );
+
+    await _saveDayForDate(normalizedDate, currentDays);
+  }
+
+  // 날짜별 'day' 수정
+  Future<void> updateDays(int index, String day) async {
+    final normalizedDate = _normalizeDate(state.selectedDate);
+    final currentDays = List<Map<String, dynamic>>.from(state.days[normalizedDate] ?? []);
+
+    if (index >= 0 && index < currentDays.length) {
+      currentDays[index] = {'day': day};
+      state = state.copyWith(
+        days: {...state.days, normalizedDate: currentDays},
+      );
+      await _saveDayForDate(normalizedDate, currentDays);
+    } else {
+      throw RangeError('Day index out of bounds');
     }
   }
 }

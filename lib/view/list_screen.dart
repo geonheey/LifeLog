@@ -10,6 +10,7 @@ import 'component/diary_content.dart';
 import 'component/diary_edit_screen.dart';
 import 'component/list_content.dart';
 import 'component/to_do_calendar.dart';
+import 'component/day_content.dart'; // DayContent를 import
 
 class ListScreen extends ConsumerWidget {
   const ListScreen({super.key});
@@ -18,7 +19,7 @@ class ListScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final taskModel = ref.watch(taskNotifierProvider);
     final taskNotifier = ref.watch(taskNotifierProvider.notifier);
-
+    final dayInt = taskModel.currentDays.length;
     return Scaffold(
       appBar: ToDoAppBar(),
       body: Column(
@@ -30,23 +31,48 @@ class ListScreen extends ConsumerWidget {
           ),
           Expanded(
             child: ListView.builder(
-              itemCount: taskModel.currentTasks.length +
+              itemCount: taskModel.currentDays.length +
+                  taskModel.currentTasks.length +
                   taskModel.currentDiaries.length,
               itemBuilder: (context, index) {
-                if (index < taskModel.currentTasks.length) {
+                if (index < taskModel.currentDays.length) {
+                  // DayContent가 가장 먼저 렌더링
+                  final dayIndex = index;
+                  final dayItem = taskModel.currentDays[dayIndex];
+                  return DayContent(
+                    day: dayItem['day'] as String,
+                    onRemove: () => taskNotifier.removeDay(dayIndex),
+                    onEdit: (updatedDay) async {
+                      try {
+                        await taskNotifier.updateDays(dayIndex, updatedDay);
+                      } catch (e) {
+                        print('Error updating day: $e');
+                      }
+                    },
+                    index: dayIndex,
+                  );
+                } else if (index <
+                    taskModel.currentDays.length +
+                        taskModel.currentTasks.length) {
+                  // 할 일 (Task) 처리
+                  final taskIndex = index - taskModel.currentDays.length;
                   return ListContent(
-                    task: taskModel.currentTasks[index]['task'],
-                    isDone: taskModel.currentTasks[index]['isDone'],
-                    onToggle: () => taskNotifier.toggleTask(index),
-                    onRemove: () => taskNotifier.removeTask(index),
+                    task: taskModel.currentTasks[taskIndex]['task'],
+                    isDone: taskModel.currentTasks[taskIndex]['isDone'],
+                    onToggle: () => taskNotifier.toggleTask(taskIndex),
+                    onRemove: () => taskNotifier.removeTask(taskIndex),
                   );
                 } else {
-                  final diaryIndex = index - taskModel.currentTasks.length;
+                  // 일기 (Diary) 처리
+                  final diaryIndex = index -
+                      taskModel.currentDays.length -
+                      taskModel.currentTasks.length;
                   final diaryItem = taskModel.currentDiaries[diaryIndex];
                   return DiaryContent(
                     diary: diaryItem['diary'] as String,
                     onRemove: () => taskNotifier.removeDiary(diaryIndex),
-                    onEdit: () { // 수정 버튼 추가
+                    onEdit: () {
+                      // 수정 버튼 추가
                       Navigator.push(
                         context,
                         MaterialPageRoute(
@@ -54,7 +80,8 @@ class ListScreen extends ConsumerWidget {
                             initialDiary: diaryItem['diary'] as String,
                             onSave: (updatedDiary) async {
                               try {
-                                await taskNotifier.updateDiary(diaryIndex, updatedDiary);
+                                await taskNotifier.updateDiary(
+                                    diaryIndex, updatedDiary);
                               } catch (e) {
                                 print('Error updating diary: $e');
                               }
@@ -78,7 +105,6 @@ class ListScreen extends ConsumerWidget {
         children: [
           SpeedDialChild(
             child: const Icon(Icons.edit),
-            // label: "일기 쓰기",
             onTap: () {
               Navigator.push(
                 context,
@@ -87,7 +113,9 @@ class ListScreen extends ConsumerWidget {
                     initialDiary: null,
                     onSave: (newDiary) async {
                       try {
-                        await ref.read(taskNotifierProvider.notifier).addDiary(newDiary);
+                        await ref
+                            .read(taskNotifierProvider.notifier)
+                            .addDiary(newDiary);
                       } catch (e) {
                         print('Error adding diary: $e');
                       }
@@ -99,7 +127,6 @@ class ListScreen extends ConsumerWidget {
           ),
           SpeedDialChild(
             child: const Icon(Icons.check),
-            // label: "할 일 추가",
             onTap: () {
               showDialog(
                 context: context,
@@ -107,6 +134,22 @@ class ListScreen extends ConsumerWidget {
                   return AddTaskDialog(
                     onTaskAdded: (task) async {
                       await taskNotifier.addTask(task);
+                    },
+                  );
+                },
+              );
+            },
+          ),
+          SpeedDialChild(
+            child: const Icon(Icons.calendar_today_outlined),
+            onTap: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AddTaskDialog(
+                    isTaskInitial: false,
+                    onDayAdded: (day) async {
+                      await taskNotifier.addDay(day);
                     },
 
                   );

@@ -38,7 +38,8 @@ class ListContent extends StatelessWidget {
             },
           ),
           trailing: IconButton(
-            icon: Icon(Icons.delete),
+            icon: Icon(Icons.dangerous_outlined),
+            iconSize: 15,
             onPressed: () {
               _showBottomSheet(context);
             },
