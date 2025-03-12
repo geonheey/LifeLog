@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:to_do_list/theme/todo_theme_color.dart';
+
+import '../../theme/todo_theme_text_style.dart';
 
 class ListContent extends StatelessWidget {
   final String task;
@@ -36,7 +39,9 @@ class ListContent extends StatelessWidget {
           ),
           trailing: IconButton(
             icon: Icon(Icons.delete),
-            onPressed: onRemove,
+            onPressed: () {
+              _showBottomSheet(context);
+            },
           ),
         ),
         const Divider(
@@ -49,4 +54,30 @@ class ListContent extends StatelessWidget {
       ],
     );
   }
+  void _showBottomSheet(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoActionSheet(
+          title: Text("정말 다 했어? 오늘 열심히 살았어?"),
+          actions: [
+            CupertinoActionSheetAction(
+              child: Text('삭제',style: TodoThemeTextStyle.redMedium17,),
+              onPressed: () {
+                Navigator.pop(context);
+                onRemove();
+              },
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            child: Text('취소', style: TodoThemeTextStyle.blackMedium17,),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        );
+      },
+    );
+  }
 }
+
