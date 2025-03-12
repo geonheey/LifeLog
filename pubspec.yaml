@@ -45,7 +45,9 @@ dependencies:
   intl: ^0.20.0
   logger : ^1.4.0
   timezone: ^0.10.0
-
+  flutter_speed_dial: ^7.0.0
+  flutter_native_splash: ^2.4.5
+  pull_down_button: ^0.10.2
 
 dev_dependencies:
   flutter_test:
@@ -68,6 +70,29 @@ flutter:
   # included with your application, so that you can use the icons in
   # the material Icons class.
   uses-material-design: true
+
+  fonts:
+    - family: Pretendard
+      fonts:
+        - asset: assets/font/Pretendard-Thin.ttf
+          weight: 100
+        - asset: assets/font/Pretendard-Extra-Light.ttf
+          weight: 200
+        - asset: assets/font/Pretendard-Light.ttf
+          weight: 300
+        - asset: assets/font/Pretendard-Regular.ttf
+          weight: 400
+        - asset: assets/font/Pretendard-Medium.ttf
+          weight: 500
+        - asset: assets/font/Pretendard-Semi-Bold.ttf
+          weight: 600
+        - asset: assets/font/Pretendard-Bold.ttf
+          weight: 700
+        - asset: assets/font/Pretendard-Extra-Bold.ttf
+          weight: 800
+        - asset: assets/font/Pretendard-Black.ttf
+          weight: 900
+
 
   # To add assets to your application, add an assets section, like this:
   # assets:

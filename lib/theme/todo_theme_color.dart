@@ -16,4 +16,10 @@ class TodoThemeColor {
 
   static const Color black = Color(0xFF000000);
   static const Color white = Color(0xFFFFFFFF);
+
+  static const Color red = Color(0xFFFF4040);
+  static const Color blue = Color(0xFF48B2FF);
+  static const Color yellow = Color(0xFFFFCC48);
+  static const Color red1 = Color(0xFFFFDDD8);
+  static const Color red2 = Color(0xFFFF5E48);
 }

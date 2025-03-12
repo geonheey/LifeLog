@@ -20,6 +20,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(fontFamily: "Pretendard"),
       title: 'Todo App',
       home: ListScreen(),
       debugShowCheckedModeBanner: false,

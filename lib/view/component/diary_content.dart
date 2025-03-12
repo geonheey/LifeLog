@@ -1,24 +1,25 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:to_do_list/theme/todo_theme_text_style.dart';
 import '../../theme/todo_theme_color.dart';
-import '../../view_model/task_notifier.dart';
 import '../diary_detail_screen.dart';
-import 'diary_edit_screen.dart';
 
-class DiaryContent extends ConsumerWidget {
+class DiaryContent extends StatelessWidget {
   final String diary;
-  final int index;
   final VoidCallback onRemove;
+  final VoidCallback onEdit;
+  final int index;
 
   const DiaryContent({
     super.key,
     required this.diary,
-    required this.index,
     required this.onRemove,
+    required this.onEdit,
+    required this.index,
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     return Column(
       children: [
         ListTile(
@@ -35,7 +36,7 @@ class DiaryContent extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12,3,12,0),
+                  padding: const EdgeInsets.fromLTRB(12, 3, 12, 0),
                   child: Icon(
                     Icons.library_books,
                     size: 24,
@@ -52,35 +53,11 @@ class DiaryContent extends ConsumerWidget {
               ],
             ),
           ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              IconButton(
-                icon: const Icon(Icons.edit),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => DiaryEditScreen(
-                        initialDiary: diary,
-                        onSave: (updatedDiary) async {
-                          try {
-                            await ref.read(taskNotifierProvider.notifier).updateDiary(index, updatedDiary);
-                          } catch (e) {
-                            print('Error updating diary: $e');
-                          }
-                        },
-                      ),
-                    ),
-                  );
-                },
-              ),
-              // 🗑️ 삭제 버튼
-              IconButton(
-                icon: const Icon(Icons.delete),
-                onPressed: () => ref.read(taskNotifierProvider.notifier).removeDiary(index),
-              ),
-            ],
+          trailing: IconButton(
+            icon: const Icon(CupertinoIcons.ellipsis_circle),
+            onPressed: () {
+              _showBottomSheet(context);
+            },
           ),
         ),
         const Divider(
@@ -91,6 +68,38 @@ class DiaryContent extends ConsumerWidget {
           endIndent: 15,
         ),
       ],
+    );
+  }
+
+  void _showBottomSheet(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoActionSheet(
+          actions: [
+            CupertinoActionSheetAction(
+              child: Text('수정', style: TodoThemeTextStyle.blackMedium17,),
+              onPressed: () {
+                Navigator.pop(context);
+                onEdit();
+              },
+            ),
+            CupertinoActionSheetAction(
+              child: Text('삭제',style: TodoThemeTextStyle.redMedium17,),
+              onPressed: () {
+                Navigator.pop(context);
+                onRemove();
+              },
+            ),
+          ],
+          cancelButton: CupertinoActionSheetAction(
+            child: Text('취소', style: TodoThemeTextStyle.blackMedium17,),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+        );
+      },
     );
   }
 }
