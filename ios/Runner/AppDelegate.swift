@@ -21,18 +21,16 @@ import Flutter
             switch call.method {
             case "updateTasks":
                 self.updateTasks(call: call, result: result)
-            case "updateDiary":
-                self.updateDiary(call: call, result: result)
+            case "updateDiaries":
+                self.updateDiaries(call: call, result: result)
             case "getTasks":
                 self.getTasks(call: call, result: result)
-            case "getDiary":
-                self.getDiary(call: call, result: result)
+            case "getDiaries":
+                self.getDiaries(call: call, result: result)
             case "getAllTasks":
                 self.getAllTasks(call: call, result: result)
-            case "getAllDiary":
-                self.getAllDiary(call: call, result: result)
-            case "getDiaryForDate":  // Renamed method
-                self.getDiaryForDate(call: call, result: result)
+            case "getAllDiaries":
+                self.getAllDiaries(call: call, result: result)
             default:
                 result(FlutterMethodNotImplemented)
             }
@@ -41,6 +39,7 @@ import Flutter
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
     }
 
+    // 할 일 업데이트
     func updateTasks(call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String: Any],
               let date = args["date"] as? String,
@@ -61,49 +60,29 @@ import Flutter
         }
     }
 
-    func updateDiary(call: FlutterMethodCall, result: @escaping FlutterResult) {
+    // 일기 업데이트
+    func updateDiaries(call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String: Any],
               let date = args["date"] as? String,
-              let diary = args["diary"] as? [[String: Any]] else {
+              let diaries = args["diaries"] as? [[String: Any]] else {
             print("Invalid arguments: \(String(describing: call.arguments))")
             result(FlutterError(code: "INVALID_ARGUMENT", message: "Missing arguments", details: nil))
             return
         }
 
-        let ref = Database.database().reference().child("tasks").child(date).child("diary")
-        ref.setValue(diary) { error, _ in
+        let ref = Database.database().reference().child("diaries").child(date)
+        ref.setValue(diaries) { error, _ in
             if let error = error {
-                print("Error updating diary: \(error.localizedDescription)")
-                result(FlutterError(code: "ERROR", message: "Failed to update diary", details: nil))
+                print("Error updating diaries: \(error.localizedDescription)")
+                result(FlutterError(code: "ERROR", message: "Failed to update diaries", details: nil))
             } else {
-                print("Diary updated for date: \(date)")
-                result("Diary updated successfully.")
+                print("Diaries updated for date: \(date)")
+                result("Diaries updated successfully.")
             }
         }
     }
 
-    func getDiary(call: FlutterMethodCall, result: @escaping FlutterResult) {
-        guard let args = call.arguments as? [String: Any],
-              let date = args["date"] as? String else {
-            result(FlutterError(code: "INVALID_ARGUMENT", message: "Missing date argument", details: nil))
-            return
-        }
-
-        let ref = Database.database().reference().child("tasks").child(date).child("diary")
-        ref.observeSingleEvent(of: .value) { snapshot in
-            if snapshot.exists() {
-                let diaryList = snapshot.value
-                print("date: \(date), diary: \(String(describing: diaryList))")
-                result(diaryList)
-            } else {
-                result([])
-            }
-        } withCancel: { error in
-            print("Error getting diary: \(error.localizedDescription)")
-            result(FlutterError(code: "ERROR", message: "Failed to get diary", details: nil))
-        }
-    }
-
+    // 특정 날짜의 할 일 가져오기
     func getTasks(call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String: Any],
               let date = args["date"] as? String else {
@@ -113,9 +92,8 @@ import Flutter
 
         let ref = Database.database().reference().child("tasks").child(date)
         ref.observeSingleEvent(of: .value) { snapshot in
-            if snapshot.exists() {
-                let tasksList = snapshot.value
-                print("date: \(date), tasks: \(String(describing: tasksList))")
+            if snapshot.exists(), let tasksList = snapshot.value as? [[String: Any]] {
+                print("date: \(date), tasks: \(tasksList)")
                 result(tasksList)
             } else {
                 result([])
@@ -126,70 +104,57 @@ import Flutter
         }
     }
 
-    func getAllDiary(call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let ref = Database.database().reference().child("tasks")
-        ref.observeSingleEvent(of: .value) { snapshot in
-            if snapshot.exists() {
-                var allDiaries: [String: Any] = [:]
-                for child in snapshot.children {
-                    guard let childSnapshot = child as? DataSnapshot,
-                          let date = childSnapshot.key as String?,
-                          let diarySnapshot = childSnapshot.childSnapshot(forPath: "diary").value else {
-                        continue
-                    }
-                    if let diaryList = diarySnapshot as? [[String: Any]] {
-                        allDiaries[date] = diaryList
-                    } else if let diaryDict = diarySnapshot as? [String: Any] {
-                        let diaryList = diaryDict.values.map { $0 as! [String: Any] }
-                        allDiaries[date] = diaryList
-                    } else {
-                        allDiaries[date] = []
-                    }
-                }
-                print("All diaries: \(allDiaries)")
-                result(allDiaries)
-            } else {
-                result([:])
-            }
-        } withCancel: { error in
-            print("Error getting all diaries: \(error.localizedDescription)")
-            result(FlutterError(code: "ERROR", message: "Failed to get all diaries", details: nil))
-        }
-    }
-
-    func getAllTasks(call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let ref = Database.database().reference().child("tasks")
-        ref.observeSingleEvent(of: .value) { snapshot in
-            if snapshot.exists(), let data = snapshot.value as? [String: Any] {
-                print("all tasks: \(data)")
-                result(data)
-            } else {
-                result([:])
-            }
-        } withCancel: { error in
-            print("Error getting all tasks: \(error.localizedDescription)")
-            result(FlutterError(code: "ERROR", message: "Failed to get all tasks", details: nil))
-        }
-    }
-
-    func getDiaryForDate(call: FlutterMethodCall, result: @escaping FlutterResult) {
+    // 특정 날짜의 일기 가져오기
+    func getDiaries(call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String: Any],
               let date = args["date"] as? String else {
             result(FlutterError(code: "INVALID_ARGUMENT", message: "Missing date argument", details: nil))
             return
         }
 
-        let ref = Database.database().reference().child("tasks").child(date).child("diary")
+        let ref = Database.database().reference().child("diaries").child(date)
+        ref.observeSingleEvent(of: .value) { snapshot in
+            if snapshot.exists(), let diaryList = snapshot.value as? [[String: Any]] {
+                print("date: \(date), diaries: \(diaryList)")
+                result(diaryList)
+            } else {
+                result([])
+            }
+        } withCancel: { error in
+            print("Error getting diaries: \(error.localizedDescription)")
+            result(FlutterError(code: "ERROR", message: "Failed to get diaries", details: nil))
+        }
+    }
+
+    // 모든 할 일 가져오기
+   func getAllTasks(call: FlutterMethodCall, result: @escaping FlutterResult) {
+       let ref = Database.database().reference().child("tasks")
+       ref.observeSingleEvent(of: .value) { snapshot in
+           if snapshot.exists(), let data = snapshot.value as? [String: Any] {
+               print("All tasks: \(data)")
+               result(data)
+           } else {
+               result([:])
+           }
+       } withCancel: { error in
+           print("Error getting all tasks: \(error.localizedDescription)")
+           result(FlutterError(code: "ERROR", message: "Failed to get all tasks", details: nil))
+       }
+   }
+
+    // 모든 일기 가져오기
+    func getAllDiaries(call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let ref = Database.database().reference().child("diaries")
         ref.observeSingleEvent(of: .value) { snapshot in
             if snapshot.exists(), let data = snapshot.value as? [String: Any] {
-                print("all diaries for \(date): \(data)")
+                print("All diaries: \(data)")
                 result(data)
             } else {
                 result([:])
             }
         } withCancel: { error in
-            print("Error getting diaries for \(date): \(error.localizedDescription)")
-            result(FlutterError(code: "ERROR", message: "Failed to get diaries for date", details: nil))
+            print("Error getting all diaries: \(error.localizedDescription)")
+            result(FlutterError(code: "ERROR", message: "Failed to get all diaries", details: nil))
         }
     }
 }

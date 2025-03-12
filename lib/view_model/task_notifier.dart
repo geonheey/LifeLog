@@ -8,11 +8,12 @@ class TaskNotifier extends StateNotifier<TaskModel> {
 
   TaskNotifier()
       : super(
-          TaskModel(
-              selectedDate: _normalizeDate(DateTime.now()),
-              tasks: {},
-              diaries: {}),
-        ) {
+    TaskModel(
+      selectedDate: _normalizeDate(DateTime.now()),
+      tasks: {},
+      diaries: {},
+    ),
+  ) {
     loadAllTasks();
     loadAllDiaries();
   }
@@ -30,11 +31,7 @@ class TaskNotifier extends StateNotifier<TaskModel> {
   // 날짜 설정
   Future<void> setSelectedDate(DateTime date) async {
     final normalized = _normalizeDate(date);
-    state = TaskModel(
-      selectedDate: normalized,
-      tasks: state.tasks,
-      diaries: state.diaries,
-    );
+    state = state.copyWith(selectedDate: normalized);
     await loadTasks();
     await loadDiaries();
   }
@@ -44,13 +41,12 @@ class TaskNotifier extends StateNotifier<TaskModel> {
     try {
       final result = await platform.invokeMethod('getAllTasks');
       final Map<String, dynamic> taskData =
-          Map<String, dynamic>.from(result ?? {});
+      Map<String, dynamic>.from(result ?? {});
       final updatedTasks = <DateTime, List<Map<String, dynamic>>>{};
+
       taskData.forEach((key, value) {
         try {
-          // Safely parse date string (e.g., "2025-03-11")
-          final date =
-              DateTime.parse(key); // Use DateTime.parse for full ISO strings
+          final date = DateTime.parse(key);
           updatedTasks[date] = (value as List<dynamic>)
               .map((item) => Map<String, dynamic>.from(item as Map))
               .toList();
@@ -58,29 +54,28 @@ class TaskNotifier extends StateNotifier<TaskModel> {
           print('Failed to parse task date "$key": $e');
         }
       });
-      state = TaskModel(
-        tasks: updatedTasks,
-        diaries: state.diaries,
-        selectedDate: state.selectedDate,
-      );
+
+      state = state.copyWith(tasks: updatedTasks);
       print('Loaded tasks: $updatedTasks');
     } catch (e) {
       print('Error loading tasks: $e');
     }
   }
 
-  // 할 일 불러오기 (해당 날짜의 할 일들)
+  // 할 일 불러오기 (해당 날짜)
   Future<void> loadTasks() async {
     final dateKey = _formatDate(state.selectedDate);
-    final result = await platform.invokeMethod('getTasks', {'date': dateKey});
-    if (result is List) {
-      final tasksForDate =
-          result.map((e) => Map<String, dynamic>.from(e)).toList();
-      state = TaskModel(
-        selectedDate: state.selectedDate,
-        tasks: {...state.tasks, state.selectedDate: tasksForDate},
-        diaries: state.diaries,
-      );
+    try {
+      final result = await platform.invokeMethod('getTasks', {'date': dateKey});
+      if (result is List) {
+        final tasksForDate =
+        result.map((e) => Map<String, dynamic>.from(e)).toList();
+        state = state.copyWith(
+          tasks: {...state.tasks, state.selectedDate: tasksForDate},
+        );
+      }
+    } catch (e) {
+      print('Error loading tasks: $e');
     }
   }
 
@@ -88,15 +83,12 @@ class TaskNotifier extends StateNotifier<TaskModel> {
   Future<void> addTask(String task) async {
     final normalizedDate = _normalizeDate(state.selectedDate);
     final newTask = {'task': task, 'isDone': false};
-
     final currentTasks =
-        List<Map<String, dynamic>>.from(state.tasks[normalizedDate] ?? []);
+    List<Map<String, dynamic>>.from(state.tasks[normalizedDate] ?? []);
     currentTasks.add(newTask);
 
-    state = TaskModel(
-      selectedDate: normalizedDate,
+    state = state.copyWith(
       tasks: {...state.tasks, normalizedDate: currentTasks},
-      diaries: state.diaries,
     );
 
     await _saveTasksForDate(normalizedDate, currentTasks);
@@ -106,7 +98,6 @@ class TaskNotifier extends StateNotifier<TaskModel> {
   Future<void> _saveTasksForDate(
       DateTime date, List<Map<String, dynamic>> tasks) async {
     final dateKey = _formatDate(date);
-
     await platform.invokeMethod('updateTasks', {
       'date': dateKey,
       'tasks': tasks,
@@ -117,14 +108,11 @@ class TaskNotifier extends StateNotifier<TaskModel> {
   Future<void> toggleTask(int index) async {
     final normalizedDate = _normalizeDate(state.selectedDate);
     final currentTasks =
-        List<Map<String, dynamic>>.from(state.tasks[normalizedDate] ?? []);
-
+    List<Map<String, dynamic>>.from(state.tasks[normalizedDate] ?? []);
     currentTasks[index]['isDone'] = !currentTasks[index]['isDone'];
 
-    state = TaskModel(
-      selectedDate: normalizedDate,
+    state = state.copyWith(
       tasks: {...state.tasks, normalizedDate: currentTasks},
-      diaries: state.diaries,
     );
 
     await _saveTasksForDate(normalizedDate, currentTasks);
@@ -133,33 +121,27 @@ class TaskNotifier extends StateNotifier<TaskModel> {
   // 할 일 삭제
   Future<void> removeTask(int index) async {
     final normalizedDate = _normalizeDate(state.selectedDate);
-    final currentTasks = List<Map<String, dynamic>>.from(
-      state.tasks[normalizedDate] ?? [],
-    );
-
+    final currentTasks =
+    List<Map<String, dynamic>>.from(state.tasks[normalizedDate] ?? []);
     currentTasks.removeAt(index);
 
-    state = TaskModel(
-      selectedDate: normalizedDate,
+    state = state.copyWith(
       tasks: {...state.tasks, normalizedDate: currentTasks},
-      diaries: state.diaries,
     );
 
     await _saveTasksForDate(normalizedDate, currentTasks);
   }
 
-  // ----------------------------------------------
-
   // 모든 일기 불러오기
   Future<void> loadAllDiaries() async {
     try {
-      final result = await platform.invokeMethod('getAllDiary');
+      final result = await platform.invokeMethod('getAllDiaries'); // 메서드 이름 수정
       final Map<String, dynamic> diaryData =
-          Map<String, dynamic>.from(result ?? {});
+      Map<String, dynamic>.from(result ?? {});
       final updatedDiaries = <DateTime, List<Map<String, dynamic>>>{};
+
       diaryData.forEach((key, value) {
         try {
-          //  날짜 문자열 파싱 (e.g., "2025-03-11")
           final date = DateTime.parse(key);
           updatedDiaries[date] = (value as List<dynamic>)
               .map((item) => Map<String, dynamic>.from(item as Map))
@@ -168,11 +150,8 @@ class TaskNotifier extends StateNotifier<TaskModel> {
           print('Failed to parse diary date "$key": $e');
         }
       });
-      state = TaskModel(
-        tasks: state.tasks,
-        diaries: updatedDiaries,
-        selectedDate: state.selectedDate,
-      );
+
+      state = state.copyWith(diaries: updatedDiaries);
       print('Loaded diaries: $updatedDiaries');
     } catch (e) {
       print('Error loading diaries: $e');
@@ -182,103 +161,71 @@ class TaskNotifier extends StateNotifier<TaskModel> {
   // 일기 불러오기 (해당 날짜)
   Future<void> loadDiaries() async {
     final dateKey = _formatDate(state.selectedDate);
-    final result = await platform.invokeMethod('getDiary', {'date': dateKey});
-    if (result is List) {
-      final diaryList =
-          result.map((e) => Map<String, dynamic>.from(e)).toList();
-      state = TaskModel(
-        selectedDate: state.selectedDate,
-        tasks: state.tasks,
-        diaries: {...state.diaries, state.selectedDate: diaryList},
-      );
-    } else {
-      state = TaskModel(
-        selectedDate: state.selectedDate,
-        tasks: state.tasks,
-        diaries: {...state.diaries, state.selectedDate: []},
-      );
+    try {
+      final result = await platform.invokeMethod('getDiaries', {'date': dateKey});
+      if (result is List) {
+        final diaryList =
+        result.map((e) => Map<String, dynamic>.from(e)).toList();
+        state = state.copyWith(
+          diaries: {...state.diaries, state.selectedDate: diaryList},
+        );
+      }
+    } catch (e) {
+      print('Error loading diaries: $e');
     }
   }
 
-  //일기 추가
+  // 일기 추가
   Future<void> addDiary(String diary) async {
     final normalizedDate = _normalizeDate(state.selectedDate);
     final newDiary = {'diary': diary};
     final currentDiaries =
-        List<Map<String, dynamic>>.from(state.diaries[normalizedDate] ?? []);
+    List<Map<String, dynamic>>.from(state.diaries[normalizedDate] ?? []);
     currentDiaries.add(newDiary);
 
-    state = TaskModel(
-      selectedDate: normalizedDate,
-      tasks: state.tasks,
+    state = state.copyWith(
       diaries: {...state.diaries, normalizedDate: currentDiaries},
     );
 
     await _saveDiaryForDate(normalizedDate, currentDiaries);
   }
 
-  //일기 저장
+  // 일기 저장
   Future<void> _saveDiaryForDate(
       DateTime date, List<Map<String, dynamic>> diaries) async {
     final dateKey = _formatDate(date);
-    await platform.invokeMethod('updateDiary', {
+    await platform.invokeMethod('updateDiaries', {
       'date': dateKey,
-      'diary': diaries,
+      'diaries': diaries,
     });
   }
 
   // 일기 삭제
   Future<void> removeDiary(int index) async {
     final normalizedDate = _normalizeDate(state.selectedDate);
-    final currentDiary = List<Map<String, dynamic>>.from(
-      state.diaries[normalizedDate] ?? [],
+    final currentDiaries =
+    List<Map<String, dynamic>>.from(state.diaries[normalizedDate] ?? []);
+    currentDiaries.removeAt(index);
+
+    state = state.copyWith(
+      diaries: {...state.diaries, normalizedDate: currentDiaries},
     );
 
-    currentDiary.removeAt(index);
-
-    state = TaskModel(
-        selectedDate: normalizedDate,
-        tasks: state.tasks,
-        diaries: {...state.diaries, normalizedDate: currentDiary});
-
-    await _saveTasksForDate(normalizedDate, currentDiary);
+    await _saveDiaryForDate(normalizedDate, currentDiaries);
   }
 
-  // Future<void> updateTask(int index, String newTask) async {
-  //   final updatedTasks = Map<DateTime, List<Map<String, dynamic>>>.from(state.tasks);
-  //   final taskList = updatedTasks[state.selectedDate] ?? [];
-  //   if (index >= 0 && index < taskList.length) { // Validate index
-  //     taskList[index] = {
-  //       'task': newTask,
-  //       'isDone': taskList[index]['isDone'], // Preserve isDone
-  //     };
-  //     updatedTasks[state.selectedDate] = taskList;
-  //     state = TaskModel(
-  //       tasks: updatedTasks,
-  //       diaries: state.diaries,
-  //       selectedDate: state.selectedDate,
-  //     );
-  //   }
-  //   // Add Firebase sync here if needed
-  // }
-  //
-
-  // 수정한 일기 업로드
+  // 일기 수정
   Future<void> updateDiary(int index, String newDiary) async {
-    final updatedDiaries =
-        Map<DateTime, List<Map<String, dynamic>>>.from(state.diaries);
-    final diaryList = updatedDiaries[state.selectedDate] ?? [];
+    final normalizedDate = _normalizeDate(state.selectedDate);
+    final currentDiaries =
+    List<Map<String, dynamic>>.from(state.diaries[normalizedDate] ?? []);
 
-    if (index >= 0 && index < diaryList.length) {
-      diaryList[index] = {'diary': newDiary};
-      updatedDiaries[state.selectedDate] = diaryList;
-
-      state = TaskModel(
-        tasks: state.tasks,
-        diaries: updatedDiaries,
-        selectedDate: state.selectedDate,
+    if (index >= 0 && index < currentDiaries.length) {
+      currentDiaries[index] = {'diary': newDiary};
+      state = state.copyWith(
+        diaries: {...state.diaries, normalizedDate: currentDiaries},
       );
-      await _saveDiaryForDate(state.selectedDate, diaryList);
+      await _saveDiaryForDate(normalizedDate, currentDiaries);
     } else {
       throw RangeError('Diary index out of bounds');
     }
@@ -286,6 +233,6 @@ class TaskNotifier extends StateNotifier<TaskModel> {
 }
 
 final taskNotifierProvider =
-    StateNotifierProvider<TaskNotifier, TaskModel>((ref) {
+StateNotifierProvider<TaskNotifier, TaskModel>((ref) {
   return TaskNotifier();
 });

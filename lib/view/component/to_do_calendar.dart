@@ -30,7 +30,6 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    logger.d(_focusedDay);
     final tasks = ref.watch(taskNotifierProvider).tasks;
     final diaries = ref.watch(taskNotifierProvider).diaries;
 
@@ -82,7 +81,6 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
           )
               .isNotEmpty;
 
-          // Build markers based on tasks and diaries
           if (hasTasks || hasDiaries) {
             return Row(
               mainAxisSize: MainAxisSize.min,

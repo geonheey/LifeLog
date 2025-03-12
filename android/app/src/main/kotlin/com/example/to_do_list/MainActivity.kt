@@ -47,9 +47,9 @@ class MainActivity : FlutterActivity() {
                         }
                     }
 
-                    "updateDiary" -> {
+                    "updateDiaries" -> {
                         val date = call.argument<String>("date")
-                        val diary = call.argument<List<String>>("diary")
+                        val diary = call.argument<List<String>>("diaries")
                         if (date != null && diary != null) {
                             val diaryMap = mutableMapOf<String, Map<String, Any>>()
                             diary.forEachIndexed { index, entry ->
@@ -92,10 +92,10 @@ class MainActivity : FlutterActivity() {
                         }
                     }
 
-                    "getDiary" -> {
+                    "getDiaries" -> {
                         val date = call.argument<String>("date")
                         if (date != null) {
-                            tasksRef.child(date).child("diary").get()
+                            tasksRef.child(date).child("diaries").get()
                                 .addOnSuccessListener { snapshot ->
                                     if (snapshot.exists()) {
                                         val indicator = object : GenericTypeIndicator<Map<String, Map<String, Any>>>() {}
@@ -135,13 +135,13 @@ class MainActivity : FlutterActivity() {
                             }
                     }
 
-                    "getAllDiary" -> {
+                    "getAllDiaries" -> {
                         tasksRef.get()
                             .addOnSuccessListener { snapshot ->
                                 val allDiaries = mutableMapOf<String, Any>()
                                 for (childSnapshot in snapshot.children) {
                                     val date = childSnapshot.key ?: continue
-                                    val diarySnapshot = childSnapshot.child("diary")
+                                    val diarySnapshot = childSnapshot.child("diaries")
                                     if (diarySnapshot.exists()) {
                                         val indicator = object : GenericTypeIndicator<Map<String, Map<String, Any>>>() {}
                                         val diaryMap = diarySnapshot.getValue(indicator) ?: emptyMap<String, Map<String, Any>>()
