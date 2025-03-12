@@ -20,7 +20,7 @@ class AddTaskDialog extends StatefulWidget {
 }
 
 class _AddTaskDialogState extends State<AddTaskDialog> {
-  late TextEditingController _textController; // Use a controller for stability
+  late TextEditingController _textController;
   late bool isTask;
 
   @override

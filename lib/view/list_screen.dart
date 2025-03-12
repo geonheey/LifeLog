@@ -78,13 +78,13 @@ class ListScreen extends ConsumerWidget {
         children: [
           SpeedDialChild(
             child: const Icon(Icons.edit),
-            label: "일기 쓰기",
+            // label: "일기 쓰기",
             onTap: () {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => DiaryEditScreen(
-                    initialDiary: "", // 새 일기이므로 빈 문자열
+                    initialDiary: null,
                     onSave: (newDiary) async {
                       try {
                         await ref.read(taskNotifierProvider.notifier).addDiary(newDiary);
@@ -99,7 +99,7 @@ class ListScreen extends ConsumerWidget {
           ),
           SpeedDialChild(
             child: const Icon(Icons.check),
-            label: "할 일 추가",
+            // label: "할 일 추가",
             onTap: () {
               showDialog(
                 context: context,
@@ -108,9 +108,7 @@ class ListScreen extends ConsumerWidget {
                     onTaskAdded: (task) async {
                       await taskNotifier.addTask(task);
                     },
-                    onDiaryAdded: (diary) async {
-                      await taskNotifier.addDiary(diary);
-                    },
+
                   );
                 },
               );

@@ -23,6 +23,7 @@ class ListContent extends StatelessWidget {
           title: Text(
             task,
             style: TextStyle(
+              fontSize: 15,
               decoration: isDone ? TextDecoration.lineThrough : null,
             ),
           ),

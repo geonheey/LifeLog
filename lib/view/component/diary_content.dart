@@ -36,7 +36,7 @@ class DiaryContent extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.fromLTRB(12, 3, 12, 0),
+                  padding: const EdgeInsets.fromLTRB(12, 3, 24, 0),
                   child: Icon(
                     Icons.library_books,
                     size: 24,
@@ -47,7 +47,7 @@ class DiaryContent extends StatelessWidget {
                     diary,
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 16),
+                    style: const TextStyle(fontSize: 15),
                   ),
                 ),
               ],

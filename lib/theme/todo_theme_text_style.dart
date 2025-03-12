@@ -9,6 +9,12 @@ class TodoThemeTextStyle {
     fontWeight: FontWeight.w500,
   );
 
+  static const TextStyle blackMedium15 = TextStyle(
+    color: TodoThemeColor.black,
+    fontSize: 15,
+    fontWeight: FontWeight.w500,
+  );
+
   static const TextStyle blackMedium17 = TextStyle(
     color: TodoThemeColor.black,
     fontSize: 17,
