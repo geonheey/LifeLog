@@ -40,60 +40,27 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
   Widget build(BuildContext context) {
     final isEditing = widget.initialText != null;
     return AlertDialog(
-      title: Text(isEditing
-          ? (isTask ? '할 일 수정' : '일기 수정')
-          : (isTask ? '새 할 일 추가' : '새 일기 추가')),
+      title: Text(isEditing ? '할 일 수정' : '할 일 추가'),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           TextField(
             controller: _textController,
             decoration: InputDecoration(
-              labelText: isTask ? '할 일' : '일기 내용',
+              labelText: '할 일',
             ),
           ),
-          if (!isEditing) ...[
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      isTask = true;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isTask ? TodoThemeColor.primary : null,
-                  ),
-                  child: const Text('할 일', style: TextStyle( color:  TodoThemeColor.white,)),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      isTask = false;
-                    });
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: !isTask ? TodoThemeColor.primary : null,
-                  ),
-                  child: const Text('일기', style: TextStyle( color:  TodoThemeColor.white,)),                ),
-              ],
-            ),
-          ],
+
         ],
       ),
       actions: [
         TextButton(
           onPressed: () {
             final inputText = _textController.text.trim();
-            if (inputText.isNotEmpty) {
-              if (isTask && widget.onTaskAdded != null) {
+            if (inputText.isNotEmpty && isTask && widget.onTaskAdded != null) {
+
                 widget.onTaskAdded!(inputText);
-              } else if (!isTask && widget.onDiaryAdded != null) {
-                widget.onDiaryAdded!(inputText);
-              }
+
               Navigator.of(context).pop();
             }
           },
