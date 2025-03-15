@@ -6,30 +6,24 @@ import '../model/task_model.dart';
 class TaskNotifier extends StateNotifier<TaskModel> {
   static const platform = MethodChannel('com.example.to_do_list/task_channel');
 
-  TaskNotifier()
-      : super(
-    TaskModel(
-      selectedDate: _normalizeDate(DateTime.now()),
-      tasks: {},
-      diaries: {},
-      days: {},
-    ),
-  ) {
-    loadAllTasks();
-    loadAllDiaries();
-    loadAllDays();
+  TaskNotifier() : super(TaskModel(selectedDate: _normalizeDate(DateTime.now()), tasks: {}, diaries: {}, days: {})) {
+    _restoreState();
   }
 
-  static DateTime _normalizeDate(DateTime date) {
-    return DateTime(date.year, date.month, date.day);
-  }
+  static DateTime _normalizeDate(DateTime date) => DateTime(date.year, date.month, date.day);
 
-  String _formatDate(DateTime date) {
-    return "${date.year.toString().padLeft(4, '0')}"
-        "${date.month.toString().padLeft(2, '0')}"
-        "${date.day.toString().padLeft(2, '0')}";
-  }
+  String _formatDate(DateTime date) => "${date.year.toString().padLeft(4, '0')}${date.month.toString().padLeft(2, '0')}${date.day.toString().padLeft(2, '0')}";
 
+  // 상태 복구 메서드
+  Future<void> _restoreState() async {
+    await loadAllTasks();
+    await loadAllDiaries();
+    await loadAllDays();
+    await loadTasks();
+    await loadDiaries();
+    await loadDay();
+    print('State restored for selectedDate: ${state.selectedDate}');
+  }
   // 날짜 설정
   Future<void> setSelectedDate(DateTime date) async {
     final normalized = _normalizeDate(date);

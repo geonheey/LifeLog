@@ -4,7 +4,6 @@ import 'package:to_do_list/theme/todo_theme_text_style.dart';
 import '../../theme/todo_theme_color.dart';
 import '../diary_detail_screen.dart';
 
-
 class DiaryContent extends StatelessWidget {
   final String diary;
   final VoidCallback onRemove;
@@ -24,10 +23,11 @@ class DiaryContent extends StatelessWidget {
     return Column(
       children: [
         ListTile(
+          visualDensity: VisualDensity(vertical: -3),
           leading: const Icon(
-            Icons.library_books,
+            CupertinoIcons.doc_text_fill,
             size: 24,
-            color: TodoThemeColor.black,
+            color: Colors.brown,
           ),
           title: GestureDetector(
             onTap: () {
@@ -46,7 +46,7 @@ class DiaryContent extends StatelessWidget {
             ),
           ),
           trailing: IconButton(
-            icon: const Icon(CupertinoIcons.ellipsis_circle),
+            icon: const Icon(CupertinoIcons.ellipsis_circle, size: 15,),
             onPressed: () {
               _showBottomSheet(context);
             },
@@ -70,14 +70,20 @@ class DiaryContent extends StatelessWidget {
         return CupertinoActionSheet(
           actions: [
             CupertinoActionSheetAction(
-              child: Text('수정', style: TodoThemeTextStyle.blackMedium17,),
+              child: Text(
+                '수정',
+                style: TodoThemeTextStyle.blackMedium17,
+              ),
               onPressed: () {
                 Navigator.pop(context);
                 onEdit();
               },
             ),
             CupertinoActionSheetAction(
-              child: Text('삭제',style: TodoThemeTextStyle.redMedium17,),
+              child: Text(
+                '삭제',
+                style: TodoThemeTextStyle.redMedium17,
+              ),
               onPressed: () {
                 Navigator.pop(context);
                 onRemove();
@@ -85,7 +91,10 @@ class DiaryContent extends StatelessWidget {
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
-            child: Text('취소', style: TodoThemeTextStyle.blackMedium17,),
+            child: Text(
+              '취소',
+              style: TodoThemeTextStyle.blackMedium17,
+            ),
             onPressed: () {
               Navigator.pop(context);
             },

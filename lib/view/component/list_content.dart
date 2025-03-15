@@ -23,12 +23,14 @@ class ListContent extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-          contentPadding: const EdgeInsets.fromLTRB(12,0,24,0), // 좌우 패딩 줄이기
-
+          contentPadding: const EdgeInsets.fromLTRB(16, 0, 24, 0),
+          visualDensity: VisualDensity(vertical: -3),
           leading: Checkbox(
             value: isDone,
-            activeColor: TodoThemeColor.primary,
-            visualDensity: const VisualDensity(horizontal: -4.0, vertical: -4.0),
+            activeColor: TodoThemeColor.dark,
+            visualDensity:
+                const VisualDensity(horizontal: -4.0, vertical: -4.0),
+            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
             onChanged: (value) {
               onToggle();
             },
@@ -42,9 +44,8 @@ class ListContent extends StatelessWidget {
               decoration: isDone ? TextDecoration.lineThrough : null,
             ),
           ),
-
           trailing: IconButton(
-            icon: Icon(Icons.dangerous_outlined),
+            icon: Icon(CupertinoIcons.delete),
             iconSize: 15,
             onPressed: () {
               _showBottomSheet(context);
@@ -61,15 +62,18 @@ class ListContent extends StatelessWidget {
       ],
     );
   }
+
   void _showBottomSheet(BuildContext context) {
     showCupertinoModalPopup(
       context: context,
       builder: (BuildContext context) {
         return CupertinoActionSheet(
-          title: Text("정말 다 했어? 오늘 열심히 살았어?"),
           actions: [
             CupertinoActionSheetAction(
-              child: Text('삭제',style: TodoThemeTextStyle.redMedium17,),
+              child: Text(
+                '삭제',
+                style: TodoThemeTextStyle.redMedium17,
+              ),
               onPressed: () {
                 Navigator.pop(context);
                 onRemove();
@@ -77,7 +81,10 @@ class ListContent extends StatelessWidget {
             ),
           ],
           cancelButton: CupertinoActionSheetAction(
-            child: Text('취소', style: TodoThemeTextStyle.blackMedium17,),
+            child: Text(
+              '취소',
+              style: TodoThemeTextStyle.blackMedium17,
+            ),
             onPressed: () {
               Navigator.pop(context);
             },
@@ -87,4 +94,3 @@ class ListContent extends StatelessWidget {
     );
   }
 }
-

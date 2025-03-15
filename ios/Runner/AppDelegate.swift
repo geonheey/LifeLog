@@ -10,39 +10,49 @@ import Flutter
         _ application: UIApplication,
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
-        // Firebase initialization
         FirebaseApp.configure()
-
+Database.database().isPersistenceEnabled = true
         let controller: FlutterViewController = window?.rootViewController as! FlutterViewController
         let channel = FlutterMethodChannel(name: "com.example.to_do_list/task_channel",
                                            binaryMessenger: controller.binaryMessenger)
 
         channel.setMethodCallHandler { (call: FlutterMethodCall, result: @escaping FlutterResult) in
-           switch call.method {
-                       case "updateTasks":
-                           self.updateTasks(call: call, result: result)
-                       case "updateDiaries":
-                           self.updateDiaries(call: call, result: result)
-                       case "getTasks":
-                           self.getTasks(call: call, result: result)
-                       case "getDiaries":
-                           self.getDiaries(call: call, result: result)
-                       case "getAllTasks":
-                           self.getAllTasks(call: call, result: result)
-                       case "getAllDiaries":
-                           self.getAllDiaries(call: call, result: result)
-                       case "getAllDays":
-                           self.getAllDays(call: call, result: result)
-                       case "updateDays": // 추가된 케이스
-                           self.updateDays(call: call, result: result)
-                       case "getDays": // 누락된 케이스 추가
-                           self.getDays(call: call, result: result)
-                       default:
-                           result(FlutterMethodNotImplemented)
-                       }
+            switch call.method {
+            case "updateTasks": self.updateTasks(call: call, result: result)
+            case "updateDiaries": self.updateDiaries(call: call, result: result)
+            case "getTasks": self.getTasks(call: call, result: result)
+            case "getDiaries": self.getDiaries(call: call, result: result)
+            case "getAllTasks": self.getAllTasks(call: call, result: result)
+            case "getAllDiaries": self.getAllDiaries(call: call, result: result)
+            case "getAllDays": self.getAllDays(call: call, result: result)
+            case "updateDays": self.updateDays(call: call, result: result)
+            case "getDays": self.getDays(call: call, result: result)
+            default: result(FlutterMethodNotImplemented)
+            }
         }
         GeneratedPluginRegistrant.register(with: self)
         return super.application(application, didFinishLaunchingWithOptions: launchOptions)
+    }
+
+    // 앱이 백그라운드로 전환될 때 호출
+    override func applicationDidEnterBackground(_ application: UIApplication) {
+        print("App entered background")
+        
+        // 선택된 날짜 저장
+        let selectedDate = _formatDate(Date())
+        UserDefaults.standard.set(selectedDate, forKey: "lastSelectedDate")
+    }
+    // 앱이 다시 포그라운드로 돌아올 때 호출
+    override func applicationWillEnterForeground(_ application: UIApplication) {
+        print("App will enter foreground")
+        // Flutter 측에 상태 복구 요청 가능
+    }
+
+    // 현재 날짜를 포맷팅하는 헬퍼 함수
+    private func _formatDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyyMMdd"
+        return formatter.string(from: date)
     }
 
     // 할 일 업데이트

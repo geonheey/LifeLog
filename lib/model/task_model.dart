@@ -11,6 +11,15 @@ class TaskModel {
     required this.days,
   });
 
+  // factory TaskModel.initial() {
+  //   return TaskModel(
+  //     selectedDate: DateTime.now(),
+  //     tasks: {},
+  //     diaries: {},
+  //     days: {},
+  //   );
+  // }
+
   TaskModel copyWith({
     DateTime? selectedDate,
     Map<DateTime, List<Map<String, dynamic>>>? tasks,
@@ -24,7 +33,6 @@ class TaskModel {
       days: days ?? this.days,
     );
   }
-
   List<Map<String, dynamic>> get currentDiaries {
     return diaries[selectedDate] ?? [];
   }

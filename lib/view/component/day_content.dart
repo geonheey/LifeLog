@@ -24,7 +24,7 @@ class DayContent extends StatelessWidget {
     return Column(
       children: [
         ListTile(
-
+          visualDensity: VisualDensity(vertical: -3),
           title: GestureDetector(
             onTap: () => _showEditDialog(context),
             child: Text(
@@ -35,7 +35,7 @@ class DayContent extends StatelessWidget {
             ),
           ),
           leading: Icon(
-            Icons.star_border_outlined,
+            Icons.stars_sharp,
             color: TodoThemeColor.red,
             size: 24,
             // color: TodoThemeColor.black,

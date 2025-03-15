@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/todo_theme_text_style.dart';
+
 class DiaryEditScreen extends StatefulWidget {
   final String? initialDiary;
   final ValueChanged<String> onSave;
@@ -29,7 +31,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initialDiary == null ? "새 일기 작성" : "일기 수정"),
+        title: Text(widget.initialDiary == null ? "새 일기 작성" : "일기 수정", style: TodoThemeTextStyle.blackMedium20,),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
