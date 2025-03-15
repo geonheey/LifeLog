@@ -321,6 +321,22 @@ class TaskNotifier extends StateNotifier<TaskModel> {
       throw RangeError('Day index out of bounds');
     }
   }
+
+  Future<void> updateTasks(int index, String task) async {
+    final normalizedDate = _normalizeDate(state.selectedDate);
+    final currentTasks = List<Map<String, dynamic>>.from(state.tasks[normalizedDate] ?? []);
+
+    if (index >= 0 && index < currentTasks.length) {
+      currentTasks[index] = {'task': task};
+      state = state.copyWith(
+        tasks: {...state.tasks, normalizedDate: currentTasks},
+      );
+      await _saveTasksForDate(normalizedDate, currentTasks);
+    } else {
+      throw RangeError('Day index out of bounds');
+    }
+  }
+
 }
 
 final taskNotifierProvider =

@@ -6,13 +6,14 @@ class AddTaskDialog extends StatefulWidget {
   final Future<void> Function(String day)? onDayAdded;
   final String? initialText;
   final bool? isTaskInitial;
+  final bool isTask;
 
   const AddTaskDialog({
     super.key,
     this.onTaskAdded,
     this.onDayAdded,
     this.initialText,
-    this.isTaskInitial,
+    this.isTaskInitial, required this.isTask,
   });
 
   @override
@@ -27,7 +28,7 @@ class _AddTaskDialogState extends State<AddTaskDialog> {
   void initState() {
     super.initState();
     _textController = TextEditingController(text: widget.initialText ?? '');
-    isTask = widget.isTaskInitial ?? true;
+    isTask = widget.isTask;
   }
 
   @override

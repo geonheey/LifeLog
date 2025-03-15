@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/data/latest.dart' as tz;
-import 'package:to_do_list/view/list_screen2.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:to_do_list/view/list_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
       // ),
       // darkTheme: ThemeData.dark(),
       title: 'Todo App',
-      home: const ListScreen2(),
+      home: const ListScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

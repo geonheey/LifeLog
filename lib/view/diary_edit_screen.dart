@@ -31,7 +31,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.initialDiary == null ? "새 일기 작성" : "일기 수정", style: TodoThemeTextStyle.blackMedium20,),
+        title: Text(widget.initialDiary == null ? "새 메모 작성" : "메모 수정", style: TodoThemeTextStyle.blackMedium20,),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
@@ -49,7 +49,7 @@ class _DiaryEditScreenState extends State<DiaryEditScreen> {
           maxLines: null,
           keyboardType: TextInputType.multiline,
           decoration: const InputDecoration(
-            hintText: "여기에 일기를 작성하세요...",
+            hintText: "여기에 메모를 작성하세요...",
             border: InputBorder.none,
           ),
         ),

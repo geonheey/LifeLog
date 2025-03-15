@@ -64,6 +64,7 @@ class DayContent extends StatelessWidget {
       context: context,
       builder: (context) {
         return AddTaskDialog(
+          isTask: false,
           initialText: day,
           isTaskInitial: false,
           onDayAdded: (updatedDay) async {

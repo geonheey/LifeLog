@@ -40,7 +40,7 @@ class DiaryContent extends StatelessWidget {
             },
             child: Text(
               diary,
-              maxLines: 3,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: TodoThemeTextStyle.blackMedium15,
             ),
