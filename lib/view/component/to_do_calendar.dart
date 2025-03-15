@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:logger/logger.dart';
 import 'package:table_calendar/table_calendar.dart';
-import 'package:to_do_list/theme/todo_theme_color.dart';
 import 'package:timezone/timezone.dart' as tz;
+import 'package:to_do_list/theme/todo_theme_color.dart';
+import 'package:to_do_list/theme/todo_theme_text_style.dart';
 
 import '../../view_model/task_notifier.dart';
 
@@ -19,6 +20,7 @@ class ToDoCalendar extends ConsumerStatefulWidget {
 class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
   late DateTime _focusedDay;
   var detroit = tz.getLocation('Asia/Seoul');
+  CalendarFormat _calendarFormat = CalendarFormat.month;
 
   @override
   void initState() {
@@ -34,7 +36,6 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
     final diaries = ref.watch(taskNotifierProvider).diaries;
     final days = ref.watch(taskNotifierProvider).days;
 
-
     final selectedDate = ref.watch(taskNotifierProvider).selectedDate;
     return TableCalendar(
       firstDay: DateTime(2025, 1, 1),
@@ -43,7 +44,26 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
       selectedDayPredicate: (day) {
         return isSameDay(day, selectedDate);
       },
-      headerStyle: const HeaderStyle(formatButtonVisible: false, titleCentered: true),
+      calendarFormat: _calendarFormat,
+      availableCalendarFormats: const {
+        CalendarFormat.month: 'week',
+        CalendarFormat.twoWeeks: 'months',
+        CalendarFormat.week: '2 weeks',
+      },
+      onFormatChanged: (format) {
+        setState(() {
+          _calendarFormat = format;
+        });
+      },
+      headerStyle: HeaderStyle(
+        formatButtonVisible: true,
+        titleCentered: true,
+        formatButtonTextStyle: TodoThemeTextStyle.primaryMedium15,
+        formatButtonDecoration: BoxDecoration(
+          color: Colors.grey[200],
+          borderRadius: BorderRadius.circular(8),
+        ),
+      ),
       onDaySelected: (selectedDay, focusedDay) {
         setState(() {
           _focusedDay = focusedDay;
@@ -73,20 +93,20 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
           final hasTasks = tasks.entries
               .where(
                 (entry) => isSameDay(entry.key, date) && entry.value.isNotEmpty,
-          )
+              )
               .isNotEmpty;
 
           // 일기 체크
           final hasDiaries = diaries.entries
               .where(
                 (entry) => isSameDay(entry.key, date) && entry.value.isNotEmpty,
-          )
+              )
               .isNotEmpty;
           // 일정 체크
           final hasDays = days.entries
               .where(
                 (entry) => isSameDay(entry.key, date) && entry.value.isNotEmpty,
-          )
+              )
               .isNotEmpty;
 
           if (hasTasks || hasDiaries || hasDays) {
@@ -95,8 +115,8 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
               children: [
                 if (hasDays)
                   Container(
-                    width: 8.0,
-                    height: 8.0,
+                    width: 6.0,
+                    height: 6.0,
                     margin: const EdgeInsets.only(right: 2.0),
                     decoration: const BoxDecoration(
                       color: TodoThemeColor.red,
@@ -105,8 +125,8 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
                   ),
                 if (hasTasks)
                   Container(
-                    width: 8.0,
-                    height: 8.0,
+                    width: 6.0,
+                    height: 6.0,
                     margin: const EdgeInsets.only(right: 2.0),
                     decoration: const BoxDecoration(
                       color: TodoThemeColor.gray,
@@ -115,14 +135,13 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
                   ),
                 if (hasDiaries)
                   Container(
-                    width: 8.0,
-                    height: 8.0,
+                    width: 6.0,
+                    height: 6.0,
                     decoration: const BoxDecoration(
                       color: TodoThemeColor.gray2,
                       shape: BoxShape.circle,
                     ),
                   ),
-
               ],
             );
           }

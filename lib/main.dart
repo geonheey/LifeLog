@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:to_do_list/view/list_screen2.dart';
 import 'package:flutter/services.dart';
-import 'package:firebase_core/firebase_core.dart'; // Firebase core 임포트
+import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,9 +21,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(fontFamily: "Pretendard"),
+      // theme: ThemeData.light().copyWith(
+      //   textTheme: ThemeData.light().textTheme.apply(
+      //     fontFamily: 'Pretendard',
+      //   ),
+      // ),
+      // darkTheme: ThemeData.dark(),
       title: 'Todo App',
-      home: ListScreen2(),
+      home: const ListScreen2(),
       debugShowCheckedModeBanner: false,
     );
   }
