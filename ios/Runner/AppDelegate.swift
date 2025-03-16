@@ -76,6 +76,7 @@ Database.database().isPersistenceEnabled = true
         }
     }
 
+
     // 일기 업데이트
     func updateDiaries(call: FlutterMethodCall, result: @escaping FlutterResult) {
         guard let args = call.arguments as? [String: Any],

@@ -10,7 +10,7 @@ class ListContent extends StatelessWidget {
   final bool isDone;
   final VoidCallback onToggle;
   final VoidCallback onRemove;
-  final Function(String) onEdit;
+  final Future<void> Function(String, bool) onEdit;
 
 
   const ListContent({
@@ -79,7 +79,7 @@ class ListContent extends StatelessWidget {
           initialText: task,
           isTaskInitial: false,
           onTaskAdded: (updatedTask) async {
-            await onEdit(updatedTask);
+            await onEdit(updatedTask, isDone);
           },
         );
       },

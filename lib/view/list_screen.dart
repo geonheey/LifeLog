@@ -75,14 +75,15 @@ class ListScreen extends ConsumerWidget {
                     isDone: currentTasks[taskIndex]['isDone'] as bool? ?? false,
                     onToggle: () => taskNotifier.toggleTask(taskIndex),
                     onRemove: () => taskNotifier.removeTask(taskIndex),
-                    onEdit: (updatedTasks) async {
+                    onEdit: (updatedTask, isDone) async {
                       try {
-                        await taskNotifier.updateTasks(taskIndex, updatedTasks);
+                        await taskNotifier.updateTasks(taskIndex, updatedTask, isDone);
                       } catch (e) {
                         print('Error updating task: $e');
                       }
                     },
                   );
+
                 } else {
                   final diaryIndex = index - currentDays.length - currentTasks.length;
                   final diaryItem = currentDiaries[diaryIndex];
