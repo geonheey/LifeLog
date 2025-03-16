@@ -329,7 +329,7 @@ class TaskNotifier extends StateNotifier<TaskModel> {
     if (index >= 0 && index < currentTasks.length) {
       currentTasks[index] = {
         'task': task,
-        'isDone': isDone,  // isDone 값을 함께 업데이트
+        'isDone': isDone,
       };
       state = state.copyWith(
         tasks: {...state.tasks, normalizedDate: currentTasks},
