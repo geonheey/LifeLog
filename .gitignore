@@ -34,12 +34,17 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+# Xcode build cache
+ios/build/
 
 # Symbolication related
 app.*.symbols
 
 # Obfuscation related
 app.*.map.json
+
+# Web related
+lib/generated_plugin_registrant.dart
 
 # Android Studio will place build artifacts here
 /android/app/debug
