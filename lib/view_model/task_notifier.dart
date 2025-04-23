@@ -168,7 +168,7 @@ class TaskNotifier extends StateNotifier<TaskModel> {
         );
       }
     } catch (e) {
-      print('Error loading diaries: $e');
+      print('Error loading diaries!!!!: $e');
     }
   }
 
@@ -227,8 +227,7 @@ class TaskNotifier extends StateNotifier<TaskModel> {
       throw RangeError('Diary index out of bounds');
     }
   }
-  /////////////////////////
-/// 모든 'day' 불러오기
+  // 모든 'day' 불러오기
   Future<void> loadAllDays() async {
     try {
       final result = await platform.invokeMethod('getAllDays');

@@ -13,14 +13,18 @@ class MainActivity : FlutterActivity() {
     private val CHANNEL_NAME = "com.example.to_do_list/task_channel"
     private val TAG = "MainActivity"
 
-    private val database: FirebaseDatabase = FirebaseDatabase.getInstance("https://lifelog-14ee5-default-rtdb.firebaseio.com/")
+    private val database: FirebaseDatabase =
+        FirebaseDatabase.getInstance(dotenv.env['FIREBASE_KEY'])
     private val tasksRef: DatabaseReference = database.getReference("tasks")
+    private val diariesRef: DatabaseReference = database.getReference("diaries")
+    private val daysRef: DatabaseReference = database.getReference("days")
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)
         MethodChannel(flutterEngine.dartExecutor.binaryMessenger, CHANNEL_NAME)
             .setMethodCallHandler { call, result ->
                 when (call.method) {
+
                     "updateTasks" -> {
                         val date = call.argument<String>("date")
                         val tasks = call.argument<List<*>>("tasks")
@@ -49,23 +53,66 @@ class MainActivity : FlutterActivity() {
 
                     "updateDiaries" -> {
                         val date = call.argument<String>("date")
-                        val diary = call.argument<List<String>>("diaries")
-                        if (date != null && diary != null) {
-                            val diaryMap = mutableMapOf<String, Map<String, Any>>()
-                            diary.forEachIndexed { index, entry ->
-                                diaryMap[index.toString()] = mapOf("diary" to entry)
+                        val diaries = call.argument<List<*>>("diaries")
+                        if (date != null && diaries != null) {
+                            val diaryList = mutableListOf<Map<String, Any>>()
+
+                            diaries.forEach { item ->
+                                if (item is Map<*, *>) {
+                                    val diaryEntry = mutableMapOf<String, Any>()
+                                    (item as? Map<String, Any>)?.forEach { (key, value) ->
+                                        if (key == "diary" && value is String) {
+                                            diaryEntry[key] = value
+                                        }
+                                    }
+                                    diaryList.add(diaryEntry)
+                                }
                             }
-                            tasksRef.child(date).child("diary").setValue(diaryMap)
+
+
+
+                            diariesRef.child(date).setValue(diaryList)
                                 .addOnSuccessListener {
-                                    Log.d(TAG, "Diary updated for date: $date")
-                                    result.success("Diary updated successfully.")
+                                    Log.d(TAG, "Diaries updated for date: $date")
+                                    result.success("Diaries updated successfully.")
                                 }
                                 .addOnFailureListener { e ->
-                                    Log.e(TAG, "Error updating diary", e)
-                                    result.error("ERROR", "Failed to update diary", null)
+                                    Log.e(TAG, "Error updating diaries", e)
+                                    result.error("ERROR", "Failed to update diaries", null)
                                 }
                         } else {
                             result.error("INVALID_ARGUMENT", "null", null)
+                        }
+                    }
+
+                    "updateDays" -> {
+                        val date = call.argument<String>("date")
+                        val days = call.argument<List<*>>("days")
+                        if (date != null && days != null) {
+                            val dayList = mutableListOf<Map<String, Any>>()
+                            days.forEach { item ->
+                                if (item is Map<*, *>) {
+                                    val dayEntry = mutableMapOf<String, Any>()
+                                    (item as? Map<String, Any>)?.forEach { (key, value) ->
+                                        if (key == "day" && value is String) {
+                                            dayEntry[key] = value
+                                        }
+                                    }
+                                    dayList.add(dayEntry)
+                                }
+                            }
+
+                            daysRef.child(date).setValue(dayList)
+                                .addOnSuccessListener {
+                                    Log.d(TAG, "Days updated for date: $date")
+                                    result.success("Days updated successfully.")
+                                }
+                                .addOnFailureListener { e ->
+                                    Log.e(TAG, "Error updating days", e)
+                                    result.error("ERROR", "Failed to update days", null)
+                                }
+                        } else {
+                            result.error("INVALID_ARGUMENT", "Date or days is null", null)
                         }
                     }
 
@@ -75,8 +122,10 @@ class MainActivity : FlutterActivity() {
                             tasksRef.child(date).get()
                                 .addOnSuccessListener { snapshot ->
                                     if (snapshot.exists()) {
-                                        val indicator = object : GenericTypeIndicator<List<Map<String, Any>>>() {}
-                                        val tasksList = snapshot.getValue(indicator) ?: emptyList<Map<String, Any>>()
+                                        val indicator = object :
+                                            GenericTypeIndicator<List<Map<String, Any>>>() {}
+                                        val tasksList = snapshot.getValue(indicator)
+                                            ?: emptyList<Map<String, Any>>()
                                         Log.d(TAG, "date: $date, tasks: $tasksList")
                                         result.success(tasksList)
                                     } else {
@@ -92,29 +141,31 @@ class MainActivity : FlutterActivity() {
                         }
                     }
 
-                    "getDiaries" -> {
-                        val date = call.argument<String>("date")
-                        if (date != null) {
-                            tasksRef.child(date).child("diaries").get()
-                                .addOnSuccessListener { snapshot ->
-                                    if (snapshot.exists()) {
-                                        val indicator = object : GenericTypeIndicator<Map<String, Map<String, Any>>>() {}
-                                        val diaryMap = snapshot.getValue(indicator) ?: emptyMap<String, Map<String, Any>>()
-                                        val diaryList = diaryMap.values.toList()
-                                        Log.d(TAG, "date: $date, diary: $diaryList")
-                                        result.success(diaryList)
-                                    } else {
-                                        result.success(emptyList<Map<String, Any>>())
-                                    }
-                                }
-                                .addOnFailureListener { e ->
-                                    Log.e(TAG, "Error getting diary", e)
-                                    result.error("ERROR", "Failed to get diary", null)
-                                }
-                        } else {
-                            result.error("INVALID_ARGUMENT", "null", null)
-                        }
-                    }
+//                    "getDiaries" -> {
+//                        val date = call.argument<String>("date")
+//                        if (date != null) {
+//                            diariesRef.child(date).get()
+//                                .addOnSuccessListener { snapshot ->
+//                                    if (snapshot.exists()) {
+//                                        val indicator = object :
+//                                            GenericTypeIndicator<List<Map<String, Any>>>() {}
+//                                        val diaryList = snapshot.getValue(indicator) ?: emptyList()
+//                                        val resultList = diaryList.map {
+//                                            it["diary"] as? String ?: ""
+//                                        }
+//                                        result.success(resultList)
+//                                    } else {
+//                                        result.success(emptyList<String>())
+//                                    }
+//                                }
+//                                .addOnFailureListener { e ->
+//                                    Log.e(TAG, "Error getting diaries", e)
+//                                    result.error("ERROR", "Failed to get diaries", null)
+//                                }
+//                        } else {
+//                            result.error("INVALID_ARGUMENT", "null", null)
+//                        }
+//                    }
 
                     "getAllTasks" -> {
                         tasksRef.get()
@@ -122,8 +173,10 @@ class MainActivity : FlutterActivity() {
                                 val allTasks = mutableMapOf<String, Any>()
                                 for (childSnapshot in snapshot.children) {
                                     val date = childSnapshot.key ?: continue
-                                    val indicator = object : GenericTypeIndicator<List<Map<String, Any>>>() {}
-                                    val tasksList = childSnapshot.getValue(indicator) ?: emptyList<Map<String, Any>>()
+                                    val indicator =
+                                        object : GenericTypeIndicator<List<Map<String, Any>>>() {}
+                                    val tasksList = childSnapshot.getValue(indicator)
+                                        ?: emptyList<Map<String, Any>>()
                                     allTasks[date] = tasksList
                                 }
                                 Log.d(TAG, "all tasks: $allTasks")
@@ -135,21 +188,55 @@ class MainActivity : FlutterActivity() {
                             }
                     }
 
+                    "getAllDays" -> {
+                        daysRef.get()
+                            .addOnSuccessListener { snapshot ->
+                                val allDays = mutableMapOf<String, Any>()
+                                for (dateSnapshot in snapshot.children) {
+                                    val date = dateSnapshot.key ?: continue
+                                    val dayList = mutableListOf<Map<String, String>>()
+                                    for (indexSnapshot in dateSnapshot.children) {
+                                        val dayData = indexSnapshot.getValue(object : GenericTypeIndicator<Map<String, Any>>() {})
+                                        if (dayData != null) {
+                                            val day = dayData["day"] as? String
+                                            if (day != null) {
+                                                dayList.add(mapOf("day" to day))
+                                            }
+                                        }
+                                    }
+                                    allDays[date] = dayList
+                                }
+
+                                Log.d(TAG, "All days: $allDays")
+                                result.success(allDays)
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e(TAG, "Error getting all days", e)
+                                result.error("ERROR", "Failed to get all days", null)
+                            }
+                    }
                     "getAllDiaries" -> {
-                        tasksRef.get()
+                        diariesRef.get()
                             .addOnSuccessListener { snapshot ->
                                 val allDiaries = mutableMapOf<String, Any>()
-                                for (childSnapshot in snapshot.children) {
-                                    val date = childSnapshot.key ?: continue
-                                    val diarySnapshot = childSnapshot.child("diaries")
-                                    if (diarySnapshot.exists()) {
-                                        val indicator = object : GenericTypeIndicator<Map<String, Map<String, Any>>>() {}
-                                        val diaryMap = diarySnapshot.getValue(indicator) ?: emptyMap<String, Map<String, Any>>()
-                                        val diaryList = diaryMap.values.toList()
-                                        allDiaries[date] = diaryList
+
+                                for (dateSnapshot in snapshot.children) {
+                                    val date = dateSnapshot.key ?: continue
+                                    val diaryList = mutableListOf<Map<String, String>>()
+
+                                    for (indexSnapshot in dateSnapshot.children) {
+                                        val diaryData = indexSnapshot.getValue(object : GenericTypeIndicator<Map<String, Any>>() {})
+                                        if (diaryData != null) {
+                                            val diary = diaryData["diary"] as? String
+                                            if (diary != null) {
+                                                diaryList.add(mapOf("diary" to diary))
+                                            }
+                                        }
                                     }
+
+                                    allDiaries[date] = diaryList
                                 }
-                                Log.d(TAG, "all diaries: $allDiaries")
+
                                 result.success(allDiaries)
                             }
                             .addOnFailureListener { e ->
@@ -157,6 +244,7 @@ class MainActivity : FlutterActivity() {
                                 result.error("ERROR", "Failed to get all diaries", null)
                             }
                     }
+
 
                     else -> result.notImplemented()
                 }

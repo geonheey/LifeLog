@@ -11,6 +11,7 @@
 .history
 .svn/
 .swiftpm/
+.env
 migrate_working_dir/
 
 # IntelliJ related
@@ -44,3 +45,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Firebase config files - DO NOT COMMIT
+ios/Runner/GoogleService-Info.plist
+ios/Runner/GoogleService-Info\ 2.plist
+android/app/google-services.json
+firebase.json
+lib/firebase_options.dart
+# Firebase Crashlytics / Performance / Other generated files
+**/firebase-debug.log
+**/crashlytics-build.properties
+**/fabric.properties

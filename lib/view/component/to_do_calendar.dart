@@ -47,7 +47,7 @@ class _ToDoCalendarState extends ConsumerState<ToDoCalendar> {
       calendarFormat: _calendarFormat,
       availableCalendarFormats: const {
         CalendarFormat.month: 'week',
-        CalendarFormat.twoWeeks: 'months',
+        CalendarFormat.twoWeeks: 'month',
         CalendarFormat.week: '2 weeks',
       },
       onFormatChanged: (format) {
