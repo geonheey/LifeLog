@@ -14,7 +14,7 @@ class MainActivity : FlutterActivity() {
     private val TAG = "MainActivity"
 
     private val database: FirebaseDatabase =
-        FirebaseDatabase.getInstance(dotenv.env['FIREBASE_KEY'])
+        FirebaseDatabase.getInstance()
     private val tasksRef: DatabaseReference = database.getReference("tasks")
     private val diariesRef: DatabaseReference = database.getReference("diaries")
     private val daysRef: DatabaseReference = database.getReference("days")
